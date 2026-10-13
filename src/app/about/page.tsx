@@ -156,7 +156,7 @@ export default function AboutPage() {
           Join Us Tonight on GT Road
         </h3>
         <p className="text-xs sm:text-sm text-zinc-400">
-          Main Grand Trunk Road, near Sunny Pan Shop, Baghbanpura, Lahore • Open 5:00 PM to 2:00 AM
+          Main Grand Trunk Road, near Sunny Pan Shop, Baghbanpura, Lahore • Open 3:00 PM to 1:00 AM
         </p>
         <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
           <a

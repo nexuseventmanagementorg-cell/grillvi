@@ -1007,8 +1007,8 @@ export const initialRestaurantSettings: RestaurantSettings = {
   currency: 'Rs',
   openingHours: {
     days: 'Monday – Sunday (7 Days a Week)',
-    dineIn: '5:00 PM – 2:00 AM',
-    delivery: '5:00 PM – 1:30 AM',
+    dineIn: '3:00 PM – 1:00 AM',
+    delivery: '3:00 PM – 1:00 AM',
   },
   deliveryAreas: [
     'Baghbanpura',

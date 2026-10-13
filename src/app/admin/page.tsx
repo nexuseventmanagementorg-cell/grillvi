@@ -294,7 +294,7 @@ export default function AdminDashboardPage() {
 
       {/* Admin Top Navigation Bar */}
       <div className="bg-grill-dark border-b border-grill-border px-4 sm:px-6 lg:px-8 py-3.5 flex flex-wrap items-center justify-between gap-4">
-        <div className="flex w-full flex-wrap items-center justify-end gap-2 sm:w-auto sm:gap-3">
+        <div className="flex items-center gap-3">
           <div className="relative w-9 h-9">
             <Image
               src="/images/grillvi-logo.png"
@@ -313,7 +313,7 @@ export default function AdminDashboardPage() {
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex w-full flex-wrap items-center justify-end gap-2 sm:w-auto sm:gap-3">
           <Link
             href="/"
             target="_blank"
@@ -322,6 +322,17 @@ export default function AdminDashboardPage() {
             <ExternalLink className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">View Website</span>
           </Link>
+
+          <button
+            onClick={() => {
+              setEditingDish(null);
+              setIsDishModalOpen(true);
+            }}
+            className="shrink-0 whitespace-nowrap px-3 py-2 rounded-lg bg-gradient-to-r from-grill-orange to-grill-red hover:from-grill-orange-light text-sm font-semibold text-white flex items-center gap-1.5 transition-colors"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Add Menu Item</span>
+          </button>
 
           <button
             onClick={() => setIsPasswordModalOpen(true)}
