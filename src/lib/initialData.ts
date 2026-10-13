@@ -1039,24 +1039,24 @@ export const initialRestaurantSettings: RestaurantSettings = {
 
 export const initialPaymentSettings: PaymentSettings = {
   easypaisa: {
-    enabled: true,
-    accountTitle: 'GRILLVI RESTAURANT',
-    accountNumber: '03141915087',
-    instructions: 'Send payment via Easypaisa app to 03141915087 (GRILLVI RESTAURANT). Upload screenshot or enter transaction ID below.',
+    enabled: false,
+    accountTitle: '',
+    accountNumber: '',
+    instructions: '',
   },
   jazzcash: {
-    enabled: true,
-    accountTitle: 'GRILLVI RESTAURANT',
-    accountNumber: '03141915087',
-    instructions: 'Transfer through JazzCash to 03141915087 (GRILLVI RESTAURANT). Please attach payment screenshot for fast verification.',
+    enabled: false,
+    accountTitle: '',
+    accountNumber: '',
+    instructions: '',
   },
   bankTransfer: {
-    enabled: true,
-    bankName: 'Meezan Bank Limited',
-    accountTitle: 'GRILLVI RESTAURANT LAHORE',
-    accountNumber: '02010108920192',
-    iban: 'PK52MEZN0002010108920192',
-    instructions: 'Transfer to our Meezan Bank account. Please quote your Order ID in the transfer remarks and upload the receipt.',
+    enabled: false,
+    bankName: '',
+    accountTitle: '',
+    accountNumber: '',
+    iban: '',
+    instructions: '',
   },
   cashOnDelivery: {
     enabled: true,

@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
 import { PaymentSettings, PaymentMethod, OrderType } from '@/types';
 import { formatPKR } from '@/lib/format';
+import { isPaymentMethodAvailable } from '@/lib/paymentMethods';
 import {
   CreditCard,
   Banknote,
@@ -24,6 +25,7 @@ export default function CheckoutPage() {
   const { items, subtotal, clearCart } = useCart();
 
   const [paymentSettings, setPaymentSettings] = useState<PaymentSettings | null>(null);
+  const [paymentSettingsLoaded, setPaymentSettingsLoaded] = useState(false);
 
   // Form State
   const [customerName, setCustomerName] = useState('');
@@ -56,10 +58,30 @@ export default function CheckoutPage() {
         }
       } catch (e) {
         console.error('Failed to load payment settings:', e);
+      } finally {
+        setPaymentSettingsLoaded(true);
       }
     }
     fetchSettings();
   }, []);
+
+  useEffect(() => {
+    if (!paymentSettings) return;
+
+    const paymentMethods: PaymentMethod[] = [
+      'cash_on_delivery',
+      'easypaisa',
+      'jazzcash',
+      'bank_transfer',
+    ];
+    const availableMethods = paymentMethods.filter((method) =>
+      isPaymentMethodAvailable(paymentSettings, method)
+    );
+
+    if (!availableMethods.includes(paymentMethod)) {
+      setPaymentMethod(availableMethods[0] ?? 'cash_on_delivery');
+    }
+  }, [paymentSettings, paymentMethod]);
 
   // Handle receipt upload
   const handleReceiptUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -124,6 +146,15 @@ export default function CheckoutPage() {
 
     if (orderType === 'delivery' && (!deliveryAddress || deliveryAddress.trim().length < 5)) {
       setErrorMessage('Please enter your full delivery address (house #, street, landmark).');
+      return;
+    }
+
+    if (
+      !paymentSettingsLoaded ||
+      !paymentSettings ||
+      !isPaymentMethodAvailable(paymentSettings, paymentMethod)
+    ) {
+      setErrorMessage('No valid payment method is available right now. Please contact the restaurant.');
       return;
     }
 
@@ -380,7 +411,26 @@ export default function CheckoutPage() {
             </h2>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {!paymentSettingsLoaded && (
+                <p className="sm:col-span-2 text-sm text-zinc-400">
+                  Loading available payment methods...
+                </p>
+              )}
+              {paymentSettingsLoaded &&
+                (!paymentSettings ||
+                  !(
+                    isPaymentMethodAvailable(paymentSettings, 'cash_on_delivery') ||
+                    isPaymentMethodAvailable(paymentSettings, 'easypaisa') ||
+                    isPaymentMethodAvailable(paymentSettings, 'jazzcash') ||
+                    isPaymentMethodAvailable(paymentSettings, 'bank_transfer')
+                  )) && (
+                  <p className="sm:col-span-2 text-sm text-amber-300">
+                    Payment methods could not be loaded or are not configured. Please contact the restaurant.
+                  </p>
+                )}
               {/* Cash on Delivery */}
+              {paymentSettings &&
+                isPaymentMethodAvailable(paymentSettings, 'cash_on_delivery') && (
               <label
                 className={`p-4 rounded-2xl border cursor-pointer transition-all flex flex-col justify-between space-y-2 ${
                   paymentMethod === 'cash_on_delivery'
@@ -406,8 +456,11 @@ export default function CheckoutPage() {
                   Pay cash to the rider upon delivery or at takeaway counter.
                 </p>
               </label>
+              )}
 
               {/* Easypaisa */}
+              {paymentSettings &&
+                isPaymentMethodAvailable(paymentSettings, 'easypaisa') && (
               <label
                 className={`p-4 rounded-2xl border cursor-pointer transition-all flex flex-col justify-between space-y-2 ${
                   paymentMethod === 'easypaisa'
@@ -433,8 +486,11 @@ export default function CheckoutPage() {
                   Direct transfer via Easypaisa App or mobile account.
                 </p>
               </label>
+              )}
 
               {/* JazzCash */}
+              {paymentSettings &&
+                isPaymentMethodAvailable(paymentSettings, 'jazzcash') && (
               <label
                 className={`p-4 rounded-2xl border cursor-pointer transition-all flex flex-col justify-between space-y-2 ${
                   paymentMethod === 'jazzcash'
@@ -460,8 +516,11 @@ export default function CheckoutPage() {
                   Fast mobile transfer to GRILLVI JazzCash account.
                 </p>
               </label>
+              )}
 
               {/* Bank Transfer */}
+              {paymentSettings &&
+                isPaymentMethodAvailable(paymentSettings, 'bank_transfer') && (
               <label
                 className={`p-4 rounded-2xl border cursor-pointer transition-all flex flex-col justify-between space-y-2 ${
                   paymentMethod === 'bank_transfer'
@@ -487,6 +546,7 @@ export default function CheckoutPage() {
                   Online transfer to Meezan Bank Pakistan.
                 </p>
               </label>
+              )}
             </div>
 
             {/* Dynamic Payment Method Instructions & Slip Upload */}
@@ -670,9 +730,17 @@ export default function CheckoutPage() {
             {/* Place Order Button */}
             <button
               type="submit"
-              disabled={submitting}
+              disabled={
+                submitting ||
+                !paymentSettingsLoaded ||
+                !paymentSettings ||
+                !isPaymentMethodAvailable(paymentSettings, paymentMethod)
+              }
               className={`w-full py-4 rounded-xl font-bold text-sm shadow-orangeGlow transition-all flex items-center justify-center gap-2 ${
-                submitting
+                submitting ||
+                !paymentSettingsLoaded ||
+                !paymentSettings ||
+                !isPaymentMethodAvailable(paymentSettings, paymentMethod)
                   ? 'bg-zinc-800 text-zinc-500 cursor-not-allowed'
                   : 'bg-gradient-to-r from-grill-orange to-grill-red hover:from-grill-orange-light hover:to-grill-red text-white active:scale-95'
               }`}

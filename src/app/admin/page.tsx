@@ -57,6 +57,7 @@ export default function AdminDashboardPage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [paymentSettings, setPaymentSettings] = useState<PaymentSettings | null>(null);
+  const [savingPaymentSettings, setSavingPaymentSettings] = useState(false);
   const [restaurantSettings, setRestaurantSettings] = useState<RestaurantSettings | null>(null);
 
   // UI / Filter States
@@ -1263,16 +1264,33 @@ export default function AdminDashboardPage() {
 
               <button
                 onClick={async () => {
-                  const res = await fetch('/api/settings/payment', {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(paymentSettings),
-                  });
-                  if (res.ok) showToast('Payment settings saved persistently.');
+                  setSavingPaymentSettings(true);
+                  try {
+                    const res = await fetch('/api/settings/payment', {
+                      method: 'PUT',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify(paymentSettings),
+                    });
+                    const data = await res.json();
+                    if (!res.ok) {
+                      throw new Error(data.error || 'Failed to save payment settings.');
+                    }
+                    if (data.settings) setPaymentSettings(data.settings);
+                    showToast('Payment settings saved.');
+                  } catch (error) {
+                    showToast(
+                      error instanceof Error
+                        ? error.message
+                        : 'Failed to save payment settings.'
+                    );
+                  } finally {
+                    setSavingPaymentSettings(false);
+                  }
                 }}
+                disabled={savingPaymentSettings}
                 className="px-6 py-3 rounded-xl bg-gradient-to-r from-grill-orange to-grill-red text-white font-bold text-xs shadow-orangeGlow hover:from-grill-orange-light"
               >
-                Save Payment Settings
+                {savingPaymentSettings ? 'Saving...' : 'Save Payment Settings'}
               </button>
             </div>
           </div>
@@ -1649,10 +1667,14 @@ export default function AdminDashboardPage() {
          ======================================================== */}
       {isPasswordModalOpen && (
         <ChangePasswordModal
+          currentUsername={currentUser?.username || ''}
           onClose={() => setIsPasswordModalOpen(false)}
-          onSuccess={() => {
+          onSuccess={(username) => {
             setIsPasswordModalOpen(false);
-            showToast('Password changed successfully.');
+            setCurrentUser((user: any) =>
+              user ? { ...user, username } : user
+            );
+            showToast('Admin login details updated successfully.');
           }}
         />
       )}
@@ -1894,14 +1916,17 @@ function DishFormModal({
   );
 }
 
-// Change Password Modal Component
+// Admin Credentials Modal Component
 function ChangePasswordModal({
+  currentUsername,
   onClose,
   onSuccess,
 }: {
+  currentUsername: string;
   onClose: () => void;
-  onSuccess: () => void;
+  onSuccess: (username: string) => void;
 }) {
+  const [newUsername, setNewUsername] = useState(currentUsername);
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [error, setError] = useState('');
@@ -1916,11 +1941,11 @@ function ChangePasswordModal({
       const res = await fetch('/api/auth/change-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ currentPassword, newPassword }),
+        body: JSON.stringify({ currentPassword, newPassword, newUsername }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to update password');
-      onSuccess();
+      onSuccess(data.user.username);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Error updating password');
     } finally {
@@ -1935,7 +1960,7 @@ function ChangePasswordModal({
           ✕
         </button>
 
-        <h3 className="text-lg font-bold font-heading">Change Admin Password</h3>
+        <h3 className="text-lg font-bold font-heading">Change Admin Login Details</h3>
 
         {error && (
           <div className="p-3 rounded-xl bg-red-950/80 border border-red-700 text-red-200 text-xs">
@@ -1944,6 +1969,18 @@ function ChangePasswordModal({
         )}
 
         <form onSubmit={handleSubmit} className="space-y-3 text-xs">
+          <div>
+            <label className="text-zinc-300 block mb-1">Admin Username *</label>
+            <input
+              type="text"
+              required
+              minLength={3}
+              maxLength={50}
+              value={newUsername}
+              onChange={(e) => setNewUsername(e.target.value)}
+              className="w-full px-3 py-2 rounded-xl bg-grill-dark border border-zinc-800 text-white"
+            />
+          </div>
           <div>
             <label className="text-zinc-300 block mb-1">Current Password *</label>
             <input
@@ -1955,10 +1992,9 @@ function ChangePasswordModal({
             />
           </div>
           <div>
-            <label className="text-zinc-300 block mb-1">New Password (min 8 chars) *</label>
+            <label className="text-zinc-300 block mb-1">New Password (leave blank to keep current)</label>
             <input
               type="password"
-              required
               minLength={8}
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
@@ -1979,7 +2015,7 @@ function ChangePasswordModal({
               disabled={loading}
               className="px-5 py-2 rounded-xl bg-grill-gold text-grill-black font-bold"
             >
-              {loading ? 'Updating...' : 'Update Password'}
+              {loading ? 'Updating...' : 'Save Login Details'}
             </button>
           </div>
         </form>

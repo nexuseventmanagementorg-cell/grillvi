@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAdminUser, recordAdminLogin } from '@/lib/db';
+import { recordAdminLogin } from '@/lib/db';
+import { getPersistentAdminUser } from '@/lib/adminCredentials';
 import {
   comparePassword,
   generateToken,
@@ -29,7 +30,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const admin = getAdminUser();
+    const admin = await getPersistentAdminUser();
 
     // Check username (case-insensitive for convenience)
     if (admin.username.toUpperCase() !== username.trim().toUpperCase()) {

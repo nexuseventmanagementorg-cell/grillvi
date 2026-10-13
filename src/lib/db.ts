@@ -464,8 +464,16 @@ export function getAdminUser(): AdminUser {
 }
 
 export function updateAdminPassword(newPasswordHash: string): boolean {
+  return updateAdminCredentials(undefined, newPasswordHash);
+}
+
+export function updateAdminCredentials(
+  username?: string,
+  newPasswordHash?: string
+): boolean {
   const db = loadDatabase();
-  db.admin.passwordHash = newPasswordHash;
+  if (username !== undefined) db.admin.username = username;
+  if (newPasswordHash !== undefined) db.admin.passwordHash = newPasswordHash;
   db.admin.mustChangePassword = false;
   saveDatabase(db);
   return true;

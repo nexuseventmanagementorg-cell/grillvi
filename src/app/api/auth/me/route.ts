@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getSessionAdmin } from '@/lib/auth';
-import { getAdminUser } from '@/lib/db';
+import { getPersistentAdminUser } from '@/lib/adminCredentials';
 
 export async function GET() {
   const session = await getSessionAdmin();
@@ -8,7 +8,7 @@ export async function GET() {
     return NextResponse.json({ authenticated: false }, { status: 401 });
   }
 
-  const admin = getAdminUser();
+  const admin = await getPersistentAdminUser();
 
   return NextResponse.json({
     authenticated: true,

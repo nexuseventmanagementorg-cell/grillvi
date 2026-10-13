@@ -1,15 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getOrders, createOrder } from '@/lib/db';
+import { getOrders, createOrder, getPaymentSettings } from '@/lib/db';
 import { calculateOrderPricing } from '@/lib/pricing';
 import { buildWhatsAppLink, buildWhatsAppOrderMessage } from '@/lib/whatsapp';
 import { getSessionAdmin } from '@/lib/auth';
+import { initialPaymentSettings } from '@/lib/initialData';
+import {
+  isPersistentSettingsConfigured,
+  readPersistentSetting,
+} from '@/lib/persistentSettings';
+import { isPaymentMethodAvailable } from '@/lib/paymentMethods';
 import {
   Order,
   OrderStatus,
   PaymentMethod,
+  PaymentSettings,
   PaymentVerificationStatus,
   OrderType,
 } from '@/types';
+
+const PAYMENT_SETTINGS_KEY = 'grillvi_payment_settings';
 
 function generateOrderId(): string {
   const date = new Date();
@@ -90,6 +99,20 @@ export async function POST(req: NextRequest) {
     if (!validPaymentMethods.includes(paymentMethod)) {
       return NextResponse.json(
         { error: 'Invalid payment method selected.' },
+        { status: 400 }
+      );
+    }
+
+    const paymentSettings: PaymentSettings = isPersistentSettingsConfigured()
+      ? (await readPersistentSetting<PaymentSettings>(PAYMENT_SETTINGS_KEY)) ??
+        initialPaymentSettings
+      : process.env.NODE_ENV === 'production'
+      ? initialPaymentSettings
+      : getPaymentSettings();
+
+    if (!isPaymentMethodAvailable(paymentSettings, paymentMethod)) {
+      return NextResponse.json(
+        { error: 'That payment method is not currently configured. Please choose another method.' },
         { status: 400 }
       );
     }

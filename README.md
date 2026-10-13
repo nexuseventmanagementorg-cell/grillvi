@@ -68,6 +68,7 @@ A modern, full-stack, responsive restaurant ordering website and management plat
   - Printable multi-dish QR sticker sheet for table standees and packaging.
 - **Pakistan Payment Configuration**:
   - Configure Easypaisa, JazzCash, and Meezan Bank account titles, numbers, IBAN, and instructions.
+  - Unconfigured or disabled transfer methods are hidden at checkout and rejected by the order API.
   - Set default delivery fee, free delivery threshold, and minimum order values.
 - **Restaurant Information Management**:
   - Update address, timings, phone, WhatsApp, and top announcement banner text.
@@ -83,8 +84,9 @@ A modern, full-stack, responsive restaurant ordering website and management plat
 - **Icons**: Lucide React
 - **QR Code Engine**: `qrcode` (PNG Buffer & SVG vector generator)
 - **Database Architecture**:
-  - Persistent atomic JSON storage with memory caching in `.data/grillvi_db.json`.
-  - Full PostgreSQL / Supabase SQL schema in `supabase/schema.sql` for cloud deployment.
+  - The current application database uses atomic JSON storage with memory caching in `.data/grillvi_db.json` for local development.
+  - Payment settings and admin credentials use Supabase persistence when configured.
+  - `supabase/schema.sql` contains the PostgreSQL schema; most application data has not yet been migrated from JSON storage.
 - **Security**: `bcryptjs` password hashing, `jsonwebtoken` HttpOnly cookies, rate limiting, and server-side pricing validation.
 
 ---
@@ -102,6 +104,17 @@ Copy `.env.example` to `.env.local`:
 cp .env.example .env.local
 ```
 Before starting the app, set a unique `JWT_SECRET` of at least 32 characters and an `ADMIN_DEFAULT_PASS` of at least 12 characters. Never commit `.env.local`.
+
+### Supabase persistence for Vercel
+
+Payment settings and admin username/password changes need durable storage; Vercel's serverless filesystem cannot provide it. Before allowing those changes on a production deployment:
+
+1. Create a Supabase project and run [`supabase/schema.sql`](./supabase/schema.sql) in its SQL Editor.
+2. In the Vercel project settings, add `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` for the production environment. Keep the service-role key server-side only; never use a `NEXT_PUBLIC_` variable for it.
+3. Keep `JWT_SECRET`, `ADMIN_DEFAULT_USER`, and `ADMIN_DEFAULT_PASS` set in Vercel, then redeploy.
+4. The first admin login initializes the persistent credential record from the configured default credentials. Payment transfers start disabled and blank; configure approved account details in Admin → Payments.
+
+Without Supabase configured, production payment-setting saves and admin credential changes return an error instead of claiming they were saved. Other data—including orders, menu edits, restaurant settings, reviews, and uploaded files—still uses local JSON/filesystem storage and is **not durable on Vercel**; it requires a separate database/object-storage migration.
 
 ### 3. Run Automated Tests
 ```bash
