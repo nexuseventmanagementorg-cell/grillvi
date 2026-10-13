@@ -219,6 +219,23 @@ export default function Footer() {
         {/* Copyright */}
         <div className="mt-8 pt-6 border-t border-grill-border/40 text-center text-xs text-zinc-500">
           <p>© {new Date().getFullYear()} GRILLVI (BBQ. RICE. KARAHI). All rights reserved. Baghbanpura, Lahore, Pakistan.</p>
+          <div className="mt-3 flex flex-col items-center justify-center gap-2 sm:flex-row sm:gap-3">
+            <span>
+              Website developed by{' '}
+              <span className="font-semibold text-zinc-300">Durrani Web App Developers</span>
+            </span>
+            <span className="hidden sm:inline" aria-hidden="true">•</span>
+            <a
+              href="https://wa.me/923299669565"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 transition-colors hover:text-emerald-400"
+              aria-label="WhatsApp Durrani Web App Developers at 0329 9669565"
+            >
+              <MessageCircle className="h-3.5 w-3.5 text-emerald-500" />
+              <span>0329 9669565</span>
+            </a>
+          </div>
         </div>
       </div>
     </footer>
