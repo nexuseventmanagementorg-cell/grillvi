@@ -19,6 +19,7 @@ import {
   initialReviews,
   getInitialAdminUser,
 } from './initialData';
+import { deployedMenuImages } from './deployedMenuImages';
 
 export interface DatabaseSchema {
   version: number;
@@ -68,7 +69,10 @@ function loadDatabase(): DatabaseSchema {
   // Initialize fresh database
   const newDb: DatabaseSchema = {
     version: 1,
-    items: initialMenuItems,
+    items: initialMenuItems.map((item) => ({
+      ...item,
+      image: deployedMenuImages[item.id] ?? item.image,
+    })),
     categories: initialCategories,
     orders: [],
     reviews: initialReviews,
