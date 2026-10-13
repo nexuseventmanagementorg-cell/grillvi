@@ -1,36 +1,132 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# GRILLVI — BBQ. RICE. KARAHI (Lahore, Pakistan)
 
-## Getting Started
+A modern, full-stack, responsive restaurant ordering website and management platform for **GRILLVI — BBQ. RICE. KARAHI**, located on Main Grand Trunk Road, near Sunny Pan Shop, Baghbanpura, Lahore, Pakistan.
 
-First, run the development server:
+---
 
+## 🌟 Key Features
+
+### 1. Customer Frontend
+- **Homepage**: Hero banner featuring authentic BBQ and Thaal imagery, restaurant brand story, featured chef dishes, Thaal deals, customer review highlights (4.8/5 historical rating from 88 reviews), Google Maps directions, opening hours, and direct WhatsApp ordering.
+- **Menu System (`/menu`)**:
+  - 10 distinct categories (Starters, Pasta, BBQ Special, Pakistani Corner, BBQ Platter, Thaal Collection, Tandoor, Drinks & Water, Add-ons, Quick Sweet).
+  - Real-time search and instant category filter pills.
+  - Portion size variants (e.g. Half vs Full, 1L vs 1.5L) and customizable add-ons.
+- **Individual Food Detail Pages (`/menu/item/[id]`)**:
+  - High-res dish imagery, descriptions, portion selector, add-on selector.
+  - **Automatic QR Code Generation**: Download high-resolution PNG or SVG, and printable label with product title and price.
+- **Interactive Cart & Drawer (`/cart`)**:
+  - Instant quantity controls, line item calculations, persistent localStorage syncing.
+- **Checkout & Ordering (`/checkout`)**:
+  - Home Delivery vs Takeaway / Self-Pickup toggle.
+  - Validation of Pakistani mobile phone formats.
+  - Strict server-side recalculation of prices (client-submitted prices are never trusted).
+  - Four Pakistan payment methods (Easypaisa, JazzCash, Meezan Bank Transfer, Cash on Delivery).
+  - Receipt / payment slip upload support.
+- **Live Order Tracking (`/orders/[id]`)**:
+  - Live status pipeline: `Order Placed` ➔ `Confirmed` ➔ `Preparing` ➔ `Out for Delivery / Ready for Pickup` ➔ `Completed`.
+  - Payment verification badge.
+  - One-tap WhatsApp synchronization button with properly URL-encoded order details.
+  - Printable official customer receipt and kitchen order ticket (KOT).
+- **Customer Reviews (`/reviews`)**:
+  - Historical Google rating showcase (4.8/5 from 88 reviews).
+  - Customer review submission form with anti-spam moderation.
+- **About GRILLVI (`/about`)**:
+  - Story of GT Road heritage, live charcoal grill traditions, and the legendary Thaal sharing feasts.
+- **Contact & Location (`/contact`)**:
+  - Address: Main Grand Trunk Road, near Sunny Pan Shop, Baghbanpura, Lahore.
+  - Google Maps Plus Code: `H9JF+8R Lahore, Pakistan`.
+  - Embedded Google Map, directions button, click-to-call link, and WhatsApp chat.
+
+---
+
+### 2. Secure Admin Management Suite (`/admin`)
+
+- **Secure Authentication**:
+  - Dedicated login at `/admin/login` with brute-force rate limiting.
+  - Password hashed using `bcrypt` and session managed via secure `HttpOnly` JWT cookie.
+  - Initial admin credentials are configured using `ADMIN_DEFAULT_USER` and `ADMIN_DEFAULT_PASS` environment variables.
+  - Secure in-dashboard password update modal.
+- **Overview Dashboard**:
+  - Total orders, today's orders, pending orders, orders in prep, dispatched, completed, cancelled.
+  - Total sales in PKR and best-selling items ranking.
+  - Pending payment verification count.
+- **Order Management**:
+  - Searchable, filterable live orders table.
+  - Order status switcher with automated audit logs.
+  - One-click payment verification for manual Easypaisa/JazzCash/Bank transfers.
+  - Printable Kitchen Order Ticket (KOT) and official receipt.
+- **Menu & Price Management**:
+  - Instantly update any food price or portion cost. Changes appear on the live website immediately without rebuild.
+  - Add new dishes with image upload (stored safely in `/public/uploads/`), portion sizes, add-ons, and categories.
+  - Mark dishes as available or sold-out with a single click.
+  - Delete or archive menu items.
+- **QR Code Hub**:
+  - Visual grid of permanent QR codes for every menu item.
+  - Filter by category.
+  - One-click PNG/SVG download.
+  - Printable multi-dish QR sticker sheet for table standees and packaging.
+- **Pakistan Payment Configuration**:
+  - Configure Easypaisa, JazzCash, and Meezan Bank account titles, numbers, IBAN, and instructions.
+  - Set default delivery fee, free delivery threshold, and minimum order values.
+- **Restaurant Information Management**:
+  - Update address, timings, phone, WhatsApp, and top announcement banner text.
+- **Review Moderation**:
+  - Approve or reject customer-submitted reviews before public display.
+
+---
+
+## 🛠️ Tech Stack
+
+- **Framework**: Next.js 15.1 (App Router) + React 19 + TypeScript
+- **Styling**: Tailwind CSS (Custom Luxury Black, Charcoal, Warm Gold, and Burnt Orange palette)
+- **Icons**: Lucide React
+- **QR Code Engine**: `qrcode` (PNG Buffer & SVG vector generator)
+- **Database Architecture**:
+  - Persistent atomic JSON storage with memory caching in `.data/grillvi_db.json`.
+  - Full PostgreSQL / Supabase SQL schema in `supabase/schema.sql` for cloud deployment.
+- **Security**: `bcryptjs` password hashing, `jsonwebtoken` HttpOnly cookies, rate limiting, and server-side pricing validation.
+
+---
+
+## 🚀 Getting Started
+
+### 1. Install Dependencies
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Environment Variables
+Copy `.env.example` to `.env.local`:
+```bash
+cp .env.example .env.local
+```
+Before starting the app, set a unique `JWT_SECRET` of at least 32 characters and an `ADMIN_DEFAULT_PASS` of at least 12 characters. Never commit `.env.local`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 3. Run Automated Tests
+```bash
+node scripts/verify-grillvi.mjs
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 4. Start Development Server
+```bash
+npm run dev
+```
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-## Learn More
+### 5. Production Build
+```bash
+npm run build
+npm run start
+```
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 📍 Restaurant Details
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **Restaurant Name**: GRILLVI
+- **Tagline**: BBQ. RICE. KARAHI
+- **Phone / WhatsApp**: +92 314 1915087
+- **Address**: Main Grand Trunk Road, near Sunny Pan Shop, Baghbanpura, Lahore, 54920, Pakistan
+- **Google Maps Location**: H9JF+8R Lahore, Pakistan
+- **Currency**: Pakistani Rupees (PKR / Rs)
