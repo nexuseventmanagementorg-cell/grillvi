@@ -41,6 +41,7 @@ import {
   KeyRound,
   RefreshCw,
   TrendingUp,
+  Flame,
 } from 'lucide-react';
 
 export default function AdminDashboardPage() {
@@ -342,7 +343,7 @@ export default function AdminDashboardPage() {
   if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-grill-black text-zinc-400">
-        Authenticating GRILLVI Admin Portal...
+        Authenticating Admin Portal...
       </div>
     );
   }
@@ -384,17 +385,12 @@ export default function AdminDashboardPage() {
       {/* Admin Top Navigation Bar */}
       <div className="bg-grill-dark border-b border-grill-border px-4 sm:px-6 lg:px-8 py-3.5 flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="relative w-9 h-9">
-            <Image
-              src="/images/grillvi-logo.png"
-              alt="GRILLVI Logo"
-              fill
-              className="object-contain"
-            />
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-grill-gold/30 bg-grill-card text-grill-gold">
+            <Flame className="h-5 w-5" />
           </div>
           <div>
             <h1 className="text-base font-bold text-white font-heading">
-              GRILLVI Admin Suite
+              Restaurant Admin Suite
             </h1>
             <span className="text-[10px] text-grill-gold uppercase tracking-wider font-semibold">
               Live Operations & Management {currentUser?.username ? `• ${currentUser.username}` : ''}
@@ -1265,7 +1261,7 @@ export default function AdminDashboardPage() {
                   className="p-5 rounded-2xl bg-white text-black shadow-xl flex flex-col items-center text-center space-y-3"
                 >
                   <span className="text-[10px] font-black uppercase tracking-widest text-zinc-600">
-                    GRILLVI LAHORE
+                    Restaurant Name
                   </span>
 
                   {dish.qrCodeDataUrl ? (

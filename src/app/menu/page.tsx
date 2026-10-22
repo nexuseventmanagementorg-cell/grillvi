@@ -75,7 +75,7 @@ function MenuContent() {
             FRESH DESI & CHARCOAL SPECIALTIES
           </span>
           <h1 className="text-3xl sm:text-4xl font-black text-white font-heading">
-            GRILLVI Full Restaurant Menu
+            Full Restaurant Menu
           </h1>
           <p className="text-xs sm:text-sm text-zinc-400 mt-1 max-w-xl">
             Browse authentic live BBQ, spiced rice Thaals, handi karahis, fresh tandoor breads and desserts.
@@ -197,7 +197,7 @@ export default function MenuPage() {
     <Suspense
       fallback={
         <div className="max-w-7xl mx-auto px-4 py-20 text-center text-zinc-400">
-          Loading GRILLVI Menu...
+          Loading Restaurant Menu...
         </div>
       }
     >

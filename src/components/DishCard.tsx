@@ -334,7 +334,7 @@ export default function DishCard({ item }: DishCardProps) {
             </button>
 
             <span className="text-xs font-bold uppercase tracking-widest text-grill-gold block mb-1">
-              GRILLVI DIGITAL QR
+              RESTAURANT DIGITAL QR
             </span>
             <h3 className="text-lg font-bold font-heading mb-3">{item.name}</h3>
 

@@ -1,5 +1,5 @@
 -- ============================================================
--- GRILLVI — BBQ. RICE. KARAHI (Lahore, Pakistan)
+-- Restaurant website template schema
 -- PostgreSQL / Supabase Complete Production Schema
 -- ============================================================
 
@@ -86,7 +86,7 @@ CREATE TABLE IF NOT EXISTS menu_item_images (
 
 -- 7. Orders Table
 CREATE TABLE IF NOT EXISTS orders (
-  id VARCHAR(50) PRIMARY KEY, -- e.g. GV-2026-1001
+  id VARCHAR(50) PRIMARY KEY, -- e.g. ORD-2026-1001
   customer_name VARCHAR(100) NOT NULL,
   phone VARCHAR(30) NOT NULL,
   whatsapp_number VARCHAR(30),

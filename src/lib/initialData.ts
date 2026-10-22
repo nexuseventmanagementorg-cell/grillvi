@@ -657,7 +657,7 @@ export const initialMenuItems: MenuItem[] = [
     categorySlug: 'thaal-collection',
     description: 'Traditional metal platter filled with Special Rice, Malai Boti (3 pc), Tikka Boti (3 pc), Chicken Seekh Kabab (3 pc), Roasted Vegetables, Roasted Dry Nuts & Special Sauces. Feeds 2-3.',
     basePrice: 2299,
-    image: '/images/grillvi-thaal-special.jpg',
+    image: '/images/signature-sharing-thaal.jpg',
     isAvailable: true,
     isFeatured: true,
     isPopular: true,
@@ -667,13 +667,13 @@ export const initialMenuItems: MenuItem[] = [
   },
   {
     id: 'gv-thaal-02',
-    name: 'Grillvi Special Thaal',
-    slug: 'grillvi-special-thaal',
+    name: 'Signature Sharing Thaal',
+    slug: 'signature-sharing-thaal',
     categoryId: 'cat-thaal-collection',
     categorySlug: 'thaal-collection',
     description: 'Our top signature royal feast: Large bed of Special Rice, Malai Boti (5 pc), Tikka Boti (5 pc), Achari Boti (5 pc), Chicken Seekh Kabab (3 pc), Beef Seekh Kabab (2 pc), Chicken Turkish Kabab (3 pc), Roasted Vegetables, Roasted Dry Nuts & Special Sauces. Feeds 4-5.',
     basePrice: 4499,
-    image: '/images/grillvi-thaal-special.jpg',
+    image: '/images/signature-sharing-thaal.jpg',
     isAvailable: true,
     isFeatured: true,
     isPopular: true,
@@ -683,13 +683,13 @@ export const initialMenuItems: MenuItem[] = [
   },
   {
     id: 'gv-thaal-03',
-    name: 'Grillvi Jumbo Feast Thaal',
-    slug: 'grillvi-jumbo-feast-thaal',
+    name: 'Family Sharing Feast Thaal',
+    slug: 'family-sharing-feast-thaal',
     categoryId: 'cat-thaal-collection',
     categorySlug: 'thaal-collection',
     description: 'The monumental party feast: Mountain of Special Spiced Rice, Malai Boti (7 pc), Tikka Boti (7 pc), Chicken Seekh Kabab (4 pc), Beef Seekh Kabab (4 pc), Chicken Turkish Kabab (4 pc), Chicken Reshmi Kabab (4 pc), Roasted Vegetables, Roasted Dry Nuts & Special Sauces. Feeds 6-8.',
     basePrice: 6499,
-    image: '/images/grillvi-jumbo-thaal.jpg',
+    image: '/images/family-sharing-thaal.jpg',
     isAvailable: true,
     isFeatured: true,
     isPopular: true,
@@ -996,44 +996,30 @@ export const initialMenuItems: MenuItem[] = [
 ];
 
 export const initialRestaurantSettings: RestaurantSettings = {
-  name: 'GRILLVI',
-  tagline: 'BBQ. RICE. KARAHI',
-  phone: '+92 314 1915087',
-  whatsapp: '+92 314 1915087',
-  address: 'Main Grand Trunk Road, near Sunny Pan Shop, Baghbanpura, Lahore, 54920, Pakistan',
-  googleMapsPlusCode: 'H9JF+8R Lahore, Pakistan',
-  googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Grillvi+Main+Grand+Trunk+Road+Baghbanpura+Lahore+Pakistan',
+  name: 'Restaurant Name',
+  tagline: 'Your Restaurant Tagline',
+  phone: '',
+  whatsapp: '',
+  address: '',
+  googleMapsPlusCode: '',
+  googleMapsUrl: '',
   category: 'Barbecue restaurant',
   currency: 'Rs',
   openingHours: {
-    days: 'Monday – Sunday (7 Days a Week)',
-    dineIn: '3:00 PM – 1:00 AM',
-    delivery: '3:00 PM – 1:00 AM',
+    days: 'Add business days',
+    dineIn: 'Add dine-in hours',
+    delivery: 'Add delivery hours',
   },
-  deliveryAreas: [
-    'Baghbanpura',
-    'Shalimar Town',
-    'Singhpura',
-    'Daroghwala',
-    'Salamatpura',
-    'GT Road vicinity',
-    'Harbanspura',
-    'Mughalpura',
-  ],
+  deliveryAreas: [],
   announcementBanner: {
-    enabled: true,
-    badge: 'FRESH ON THE COALS',
-    text: 'Serving authentic live BBQ, spiced rice Thaals & handi karahi on Main GT Road, Lahore! Order online or on WhatsApp.',
+    enabled: false,
+    badge: 'WELCOME',
+    text: 'Add your announcement in restaurant settings.',
   },
   socialLinks: {
-    facebook: 'https://facebook.com/grillvi.pk',
-    instagram: 'https://instagram.com/grillvi.pk',
-    tiktok: 'https://tiktok.com/@grillvi.pk',
-  },
-  googleHistoricalRating: {
-    rating: 4.8,
-    reviewCount: 88,
-    sourceNote: 'Historical rating as recorded from Google Maps reviews (4.8/5 from 88 customer reviews).',
+    facebook: '',
+    instagram: '',
+    tiktok: '',
   },
 };
 
@@ -1068,51 +1054,10 @@ export const initialPaymentSettings: PaymentSettings = {
   acceptingOrders: true,
 };
 
-export const initialReviews: Review[] = [
-  {
-    id: 'rev-01',
-    customerName: 'Muhammad Salman',
-    rating: 5,
-    comment: 'The Thaal feast is truly incredible! The aromatic rice paired with succulent malai boti, Turkish kebabs and the sauces is hands down the best on GT Road.',
-    dishRecommended: 'Grillvi Special Thaal',
-    source: 'google_historical',
-    status: 'approved',
-    createdAt: '2026-09-15T19:30:00Z',
-  },
-  {
-    id: 'rev-02',
-    customerName: 'Hamza Tariq',
-    rating: 5,
-    comment: 'Authentic Chicken Karahi made right before our eyes. Fresh tomatoes, ginger juliennes and hot tandoori roghni naan. 10/10 taste and generous portions.',
-    dishRecommended: 'Chicken Karahi',
-    source: 'google_historical',
-    status: 'approved',
-    createdAt: '2026-09-22T21:15:00Z',
-  },
-  {
-    id: 'rev-03',
-    customerName: 'Ayesha Siddiqui',
-    rating: 5,
-    comment: 'Chicken Malai Boti and Turkish Kababs were exceptionally tender and juicy. The restaurant ambiance is neat and the neon sign looks stunning at night.',
-    dishRecommended: 'Chicken Malai Boti',
-    source: 'google_historical',
-    status: 'approved',
-    createdAt: '2026-09-28T20:45:00Z',
-  },
-  {
-    id: 'rev-04',
-    customerName: 'Usman Ali Butt',
-    rating: 4,
-    comment: 'Great BBQ Mix Platter and fast service. Loved the roasted nuts on the rice. Baghbanpura needed a quality place like this!',
-    dishRecommended: 'BBQ Mix Platter',
-    source: 'google_historical',
-    status: 'approved',
-    createdAt: '2026-10-04T22:00:00Z',
-  },
-];
+export const initialReviews: Review[] = [];
 
 export const getInitialAdminUser = (): AdminUser => {
-  const username = process.env.ADMIN_DEFAULT_USER || 'GRILLVI';
+  const username = process.env.ADMIN_DEFAULT_USER || 'ADMIN';
   const password = process.env.ADMIN_DEFAULT_PASS;
   if (!password || password.length < 12) {
     throw new Error('ADMIN_DEFAULT_PASS must be configured with at least 12 characters.');
@@ -1122,7 +1067,7 @@ export const getInitialAdminUser = (): AdminUser => {
   const passwordHash = bcrypt.hashSync(password, salt);
 
   return {
-    id: 'admin-grillvi-01',
+    id: 'admin-template-01',
     username,
     passwordHash,
     role: 'admin',

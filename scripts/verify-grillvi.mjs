@@ -5,7 +5,7 @@ import bcrypt from 'bcryptjs';
 import QRCode from 'qrcode';
 
 console.log('====================================================');
-console.log('🧪 RUNNING GRILLVI RESTAURANT AUTOMATED TEST SUITE');
+console.log('🧪 RUNNING RESTAURANT TEMPLATE AUTOMATED TEST SUITE');
 console.log('====================================================\n');
 
 // 1. Verify Initial Data & Catalogue
@@ -47,8 +47,8 @@ const requiredPrices = [
   { item: 'Seekh Kabab Platter', price: '1099' },
   { item: 'BBQ Mix Platter', price: '1999' },
   { item: 'Thaal 1', price: '2299' },
-  { item: 'Grillvi Special Thaal', price: '4499' },
-  { item: 'Grillvi Jumbo Feast Thaal', price: '6499' },
+  { item: 'Signature Sharing Thaal', price: '4499' },
+  { item: 'Family Sharing Feast Thaal', price: '6499' },
   { item: 'Soft Drink Regular', price: '90' },
   { item: 'Soft Drink 1 Litre', price: '170' },
   { item: 'Soft Drink 1.5 Litre', price: '220' },
@@ -97,58 +97,36 @@ const qrDataUrl = await QRCode.toDataURL(testUrl);
 assert(qrDataUrl.startsWith('data:image/png;base64,'), 'QR Code must be valid PNG data URL');
 console.log('✅ QR Code generated successfully (' + qrDataUrl.slice(0, 35) + '...)');
 
-// 4. Verify WhatsApp Message Generator & URL encoding
-console.log('\nStep 4: Checking WhatsApp URL Encoding & Structure...');
-const mockOrder = {
-  id: 'GV-2610-8421',
-  customerName: 'Muhammad Salman',
-  phone: '03141915087',
-  orderType: 'delivery',
-  deliveryAddress: 'House 12, Street 3, Baghbanpura Lahore',
-  items: [
-    { name: 'Grillvi Special Thaal', quantity: 1, subtotal: 4499 },
-    { name: 'Roghni Naan', quantity: 4, subtotal: 280 },
-  ],
-  subtotal: 4779,
-  deliveryFee: 0,
-  totalAmount: 4779,
-  paymentMethod: 'cash_on_delivery',
-};
-
-const messageLines = [
-  'Hello GRILLVI! I would like to place an order.',
-  `Order ID: ${mockOrder.id}`,
-  'Grillvi Special Thaal x 1 = Rs 4,499',
-  'Subtotal: Rs 4,779',
-  'Total Payable: Rs 4,779',
-  `Customer: ${mockOrder.customerName}`,
-  `Phone: ${mockOrder.phone}`,
-  'Payment Method: Cash on Delivery (COD)',
-];
-
-const fullMsg = messageLines.join('\n');
-const encodedWa = `https://wa.me/923141915087?text=${encodeURIComponent(fullMsg)}`;
-assert(encodedWa.includes('923141915087'), 'Must target restaurant WhatsApp number');
-assert(!encodedWa.includes(' '), 'Must be properly URL encoded with no unescaped spaces');
-console.log('✅ WhatsApp message builder properly encodes customer order details!');
+// 4. Verify template defaults do not contain the previous restaurant's contact details
+console.log('\nStep 4: Checking neutral restaurant defaults...');
+const settingsMatch = content.match(/export const initialRestaurantSettings:[\s\S]*?= \{([\s\S]*?)\n\};/);
+assert(settingsMatch, 'Initial restaurant settings must be defined');
+const defaultSettings = settingsMatch[1];
+for (const key of ['name', 'tagline', 'phone', 'whatsapp', 'address', 'googleMapsUrl']) {
+  assert(
+    new RegExp(`${key}:\\s*''`).test(defaultSettings) ||
+      (key === 'name' && /name:\s*'Restaurant Name'/.test(defaultSettings)) ||
+      (key === 'tagline' && /tagline:\s*'Your Restaurant Tagline'/.test(defaultSettings)),
+    `Default ${key} must be blank or use a generic placeholder`
+  );
+}
+console.log('✅ Restaurant identity and contact fields use neutral template defaults!');
 
 // 5. Check Image Assets
 console.log('\nStep 5: Verifying Brand Assets in public/images...');
-const brandImages = [
-  'public/images/grillvi-logo.png',
-  'public/images/restaurant-interior.jpg',
+const templateImages = [
   'public/images/chicken-karahi.jpg',
-  'public/images/grillvi-thaal-special.jpg',
-  'public/images/grillvi-jumbo-thaal.jpg',
+  'public/images/signature-sharing-thaal.jpg',
+  'public/images/family-sharing-thaal.jpg',
 ];
 
-for (const imgPath of brandImages) {
-  assert(fs.existsSync(imgPath), `Brand asset ${imgPath} must exist`);
+for (const imgPath of templateImages) {
+  assert(fs.existsSync(imgPath), `Template asset ${imgPath} must exist`);
   const stat = fs.statSync(imgPath);
   assert(stat.size > 10000, `Brand asset ${imgPath} must not be empty`);
 }
-console.log('✅ All 5 official restaurant brand images exist and are high quality!');
+console.log('✅ All template food images exist and are high quality!');
 
 console.log('\n====================================================');
-console.log('🎉 ALL TESTS PASSED! GRILLVI CODEBASE IS PRODUCTION-READY!');
+console.log('🎉 ALL TESTS PASSED! RESTAURANT TEMPLATE IS READY!');
 console.log('====================================================');

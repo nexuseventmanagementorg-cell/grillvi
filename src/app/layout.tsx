@@ -5,31 +5,23 @@ import AnnouncementBanner from '@/components/AnnouncementBanner';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import CartDrawer from '@/components/CartDrawer';
-import WhatsAppFloatingButton from '@/components/WhatsAppFloatingButton';
 
 export const metadata: Metadata = {
-  title: 'GRILLVI — BBQ. RICE. KARAHI | Authentic Charcoal Barbecue Lahore',
+  title: 'Restaurant Website Template | Durrani Web Developers',
   description:
-    'Order authentic live charcoal BBQ, Chicken Malai Boti, Handi Karahi, and Royal Thaal Feasts from GRILLVI on Main GT Road, Baghbanpura, Lahore. Fast delivery & WhatsApp ordering.',
+    'A customizable restaurant website template with online ordering, menu management, and daily sales reporting.',
   keywords: [
-    'GRILLVI',
-    'Grillvi Lahore',
-    'BBQ Lahore',
-    'Baghbanpura Restaurant',
-    'GT Road Karahi',
-    'Thaal Deal Lahore',
+    'restaurant website template',
+    'online ordering',
+    'restaurant admin dashboard',
+    'daily sales report',
     'Chicken Karahi',
     'Malai Boti',
-    'Online Food Delivery Lahore',
   ],
-  authors: [{ name: 'GRILLVI Restaurant' }],
-  icons: {
-    icon: '/images/grillvi-logo.png',
-  },
+  authors: [{ name: 'Durrani Web Developers' }],
   openGraph: {
-    title: 'GRILLVI — BBQ. RICE. KARAHI | Lahore',
-    description: 'Experience the authentic taste of live charcoal BBQ, rice & karahi on Main Grand Trunk Road, Lahore.',
-    images: ['/images/grillvi-logo.png'],
+    title: 'Restaurant Website Template',
+    description: 'A customizable restaurant website and management dashboard.',
   },
 };
 
@@ -46,7 +38,6 @@ export default function RootLayout({
           <Navbar />
           <main className="flex-1">{children}</main>
           <CartDrawer />
-          <WhatsAppFloatingButton />
           <Footer />
         </CartProvider>
       </body>

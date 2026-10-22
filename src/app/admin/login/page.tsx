@@ -2,13 +2,12 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
 import Link from 'next/link';
-import { ShieldCheck, Lock, User, AlertCircle, Eye, EyeOff, Home } from 'lucide-react';
+import { ShieldCheck, Lock, User, AlertCircle, Eye, EyeOff, Home, Flame } from 'lucide-react';
 
 export default function AdminLoginPage() {
   const router = useRouter();
-  const [username, setUsername] = useState('GRILLVI');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -65,13 +64,8 @@ export default function AdminLoginPage() {
       <div className="w-full max-w-md p-8 sm:p-10 rounded-3xl bg-grill-card border border-grill-border shadow-2xl space-y-6">
         {/* Brand Header */}
         <div className="text-center space-y-3">
-          <div className="relative w-16 h-16 mx-auto">
-            <Image
-              src="/images/grillvi-logo.png"
-              alt="GRILLVI Logo"
-              fill
-              className="object-contain"
-            />
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl border border-grill-gold/30 bg-grill-dark text-grill-gold">
+            <Flame className="h-8 w-8" />
           </div>
 
           <div>
@@ -105,6 +99,7 @@ export default function AdminLoginPage() {
               <input
                 type="text"
                 required
+                placeholder="Admin username"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 className="w-full pl-10 pr-4 py-3 rounded-xl bg-grill-dark border border-zinc-800 focus:border-grill-gold focus:outline-none text-white text-xs font-medium"

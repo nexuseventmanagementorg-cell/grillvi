@@ -198,7 +198,7 @@ export default function CartPage() {
           <div className="flex items-center gap-2 text-[11px] text-zinc-400 pt-2">
             <ShieldCheck className="w-4 h-4 text-emerald-400 flex-shrink-0" />
             <span>
-              Real-time WhatsApp confirmation and verified Pakistan payment methods.
+              Order confirmation and available payment methods.
             </span>
           </div>
         </div>

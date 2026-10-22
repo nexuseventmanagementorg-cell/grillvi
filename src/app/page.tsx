@@ -1,18 +1,14 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { getItems, getRestaurantSettings, getReviews } from '@/lib/db';
+import { getItems, getReviews } from '@/lib/db';
 import DishCard from '@/components/DishCard';
 import StarRating from '@/components/StarRating';
 import {
   Flame,
   ArrowRight,
-  MessageCircle,
-  MapPin,
-  Clock,
   Star,
   Sparkles,
-  Phone,
   Utensils,
   Award,
   Users,
@@ -24,7 +20,6 @@ export default function HomePage() {
   const featuredDishes = getItems({ featuredOnly: true }).slice(0, 6);
   const thaalDeals = getItems({ category: 'thaal-collection' }).slice(0, 3);
   const bbqPlatters = getItems({ category: 'bbq-platter' }).slice(0, 3);
-  const settings = getRestaurantSettings();
   const reviews = getReviews(true).slice(0, 3);
 
   return (
@@ -40,7 +35,7 @@ export default function HomePage() {
           <div className="flex-1 text-center lg:text-left space-y-6">
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-grill-card border border-grill-gold/40 text-xs font-bold text-grill-gold tracking-wide shadow-gold">
               <Flame className="w-3.5 h-3.5 text-grill-orange animate-pulse" />
-              <span>MAIN GRAND TRUNK ROAD, BAGHBANPURA, LAHORE</span>
+              <span>FRESHLY PREPARED • MADE TO ORDER</span>
             </div>
 
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white leading-tight font-heading">
@@ -52,7 +47,7 @@ export default function HomePage() {
             </h1>
 
             <p className="text-base sm:text-lg text-zinc-300 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
-              Welcome to <span className="text-white font-semibold">GRILLVI</span>, where live charcoal grills meet rich Lahori handi traditions. From sizzling Chicken Karahi to royal multi-person Thaal Feasts, every bite is cooked fresh to perfection.
+              Welcome to <span className="text-white font-semibold">Restaurant Name</span>, where freshly prepared favorites and generous sharing meals are made to order.
             </p>
 
             {/* CTAs */}
@@ -73,35 +68,15 @@ export default function HomePage() {
                 <Utensils className="w-4 h-4" />
               </Link>
 
-              <a
-                href="https://wa.me/923141915087"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-5 py-4 rounded-xl bg-emerald-950/70 hover:bg-emerald-900 text-emerald-400 border border-emerald-600/40 font-bold text-sm transition-all flex items-center gap-2"
-              >
-                <MessageCircle className="w-4 h-4" />
-                <span>WhatsApp Order</span>
-              </a>
             </div>
 
             {/* Rating Highlight Pill */}
             <div className="pt-4 flex flex-wrap items-center justify-center lg:justify-start gap-6 text-xs text-zinc-400">
               <div className="flex items-center gap-2 bg-grill-dark/80 px-4 py-2 rounded-xl border border-grill-border">
-                <div className="flex text-grill-gold">
-                  <Star className="w-4 h-4 fill-grill-gold" />
-                  <Star className="w-4 h-4 fill-grill-gold" />
-                  <Star className="w-4 h-4 fill-grill-gold" />
-                  <Star className="w-4 h-4 fill-grill-gold" />
-                  <Star className="w-4 h-4 fill-grill-gold" />
-                </div>
-                <span className="font-bold text-white text-sm">4.8 / 5.0</span>
-                <span>(88 Google Reviews)</span>
+              <Sparkles className="h-4 w-4 text-grill-gold" />
+              <span>Freshly prepared to order</span>
               </div>
 
-              <div className="flex items-center gap-2">
-                <Clock className="w-4 h-4 text-grill-gold" />
-                <span>Open Daily: 3:00 PM – 1:00 AM</span>
-              </div>
             </div>
           </div>
 
@@ -109,8 +84,8 @@ export default function HomePage() {
           <div className="flex-1 relative w-full max-w-lg lg:max-w-none">
             <div className="relative mx-auto w-full aspect-[4/3] rounded-3xl overflow-hidden border-2 border-grill-gold/30 shadow-[0_15px_50px_rgba(0,0,0,0.8)] group">
               <Image
-                src="/images/grillvi-thaal-special.jpg"
-                alt="Grillvi Special BBQ Thaal Feast"
+                src="/images/family-sharing-thaal.jpg"
+                alt="Restaurant sharing meal"
                 fill
                 priority
                 className="object-cover transition-transform duration-700 group-hover:scale-105"
@@ -124,7 +99,7 @@ export default function HomePage() {
                     SIGNATURE MASTERPIECE
                   </span>
                   <h3 className="text-white font-heading font-bold text-lg">
-                    Grillvi Special Thaal
+                    Signature Sharing Thaal
                   </h3>
                   <p className="text-xs text-zinc-300">
                     Spiced Rice + 20 Charcoal BBQ Skewers + Sauces & Nuts
@@ -139,7 +114,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* WHY GRILLVI - VALUE PROPOSITIONS */}
+      {/* RESTAURANT VALUE PROPOSITIONS */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="p-6 rounded-2xl bg-grill-card border border-grill-border hover:border-grill-gold/40 transition-colors space-y-3">
@@ -207,6 +182,11 @@ export default function HomePage() {
           {thaalDeals.map((dish) => (
             <DishCard key={dish.id} item={dish} />
           ))}
+          {reviews.length === 0 && (
+            <p className="md:col-span-3 rounded-2xl border border-grill-border bg-grill-card p-6 text-center text-sm text-zinc-400">
+              Customer reviews will appear here once they are approved.
+            </p>
+          )}
         </div>
       </section>
 
@@ -251,7 +231,7 @@ export default function HomePage() {
               Popular Dishes & Platters
             </h2>
             <p className="text-sm text-zinc-400 mt-1 max-w-xl">
-              Customer favorites loved by families across Baghbanpura, Shalimar Town and GT Road Lahore.
+              Explore freshly prepared favorites and sharing meals from our menu.
             </p>
           </div>
           <Link
@@ -299,7 +279,7 @@ export default function HomePage() {
           <div className="relative w-full max-w-sm aspect-square rounded-2xl overflow-hidden border border-grill-gold/30 shadow-xl flex-shrink-0">
             <Image
               src="/images/chicken-karahi.jpg"
-              alt="Fresh sizzling Lahori Chicken Karahi at GRILLVI"
+              alt="Fresh sizzling chicken karahi"
               fill
               className="object-cover"
             />
@@ -312,13 +292,13 @@ export default function HomePage() {
         <div className="text-center max-w-2xl mx-auto mb-12 space-y-3">
           <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-grill-card border border-grill-gold/30 text-xs font-bold text-grill-gold">
             <Star className="w-3.5 h-3.5 fill-grill-gold" />
-            <span>4.8 / 5.0 RATING (88 REVIEWS)</span>
+            <span>GUEST REVIEWS ({reviews.length})</span>
           </div>
           <h2 className="text-3xl sm:text-4xl font-black text-white font-heading">
-            What Lahore Says About Us
+            What Our Guests Say
           </h2>
           <p className="text-sm text-zinc-400">
-            Historical rating recorded from Google Maps reviews. Here is what diners love about GRILLVI.
+            See what guests have to say about their experience.
           </p>
         </div>
 
@@ -331,9 +311,7 @@ export default function HomePage() {
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <StarRating rating={rev.rating} size="sm" />
-                  <span className="text-[10px] text-zinc-500 font-medium">
-                    Google Review
-                  </span>
+                  <span className="text-[10px] text-zinc-500 font-medium">Guest Review</span>
                 </div>
                 <p className="text-sm text-zinc-300 leading-relaxed italic">
                   &ldquo;{rev.comment}&rdquo;
@@ -368,80 +346,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* LOCATION & GOOGLE MAPS SECTION */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="p-8 sm:p-12 rounded-3xl bg-grill-card border border-grill-border grid grid-cols-1 lg:grid-cols-2 gap-8 items-center shadow-card">
-          <div className="space-y-5">
-            <span className="text-xs font-bold tracking-widest text-grill-gold uppercase">
-              VISIT OUR RESTAURANT
-            </span>
-            <h2 className="text-3xl font-black text-white font-heading">
-              Located on Main GT Road, Lahore
-            </h2>
-            <div className="space-y-3 text-sm text-zinc-300">
-              <div className="flex items-start gap-3">
-                <MapPin className="w-5 h-5 text-grill-red flex-shrink-0 mt-0.5" />
-                <p>
-                  <strong className="text-white block">Address:</strong>
-                  Main Grand Trunk Road, near Sunny Pan Shop, Baghbanpura, Lahore, 54920, Pakistan
-                </p>
-              </div>
-              <div className="flex items-center gap-3">
-                <Clock className="w-5 h-5 text-grill-gold flex-shrink-0" />
-                <p>
-                  <strong className="text-white">Opening Hours:</strong> 3:00 PM – 1:00 AM (Daily)
-                </p>
-              </div>
-              <div className="flex items-center gap-3">
-                <Phone className="w-5 h-5 text-emerald-400 flex-shrink-0" />
-                <p>
-                  <strong className="text-white">Phone / WhatsApp:</strong>{' '}
-                  <a href="tel:+923141915087" className="hover:text-white">
-                    +92 314 1915087
-                  </a>
-                </p>
-              </div>
-            </div>
-
-            <div className="pt-2 flex flex-wrap gap-3">
-              <a
-                href={settings.googleMapsUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-6 py-3 rounded-xl bg-gradient-to-r from-grill-orange to-grill-red text-white text-xs font-bold shadow-orangeGlow hover:from-grill-orange-light flex items-center gap-2"
-              >
-                <MapPin className="w-4 h-4" />
-                <span>Open Google Maps</span>
-              </a>
-
-              <a
-                href="https://wa.me/923141915087"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-6 py-3 rounded-xl bg-emerald-950/80 hover:bg-emerald-900 text-emerald-400 border border-emerald-600/40 text-xs font-bold flex items-center gap-2"
-              >
-                <MessageCircle className="w-4 h-4" />
-                <span>Chat on WhatsApp</span>
-              </a>
-            </div>
-          </div>
-
-          {/* Restaurant Sign Image / Map card */}
-          <div className="relative aspect-[4/3] rounded-2xl overflow-hidden border border-zinc-700 shadow-xl bg-zinc-900">
-            <Image
-              src="/images/restaurant-interior.jpg"
-              alt="GRILLVI restaurant neon sign and dining hall"
-              fill
-              className="object-cover"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-6">
-              <p className="text-xs text-white font-medium">
-                Dine-in family hall with comfortable seating and live BBQ aroma.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
     </div>
   );
 }

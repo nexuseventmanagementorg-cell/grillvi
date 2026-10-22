@@ -11,7 +11,6 @@ import {
   Flame,
   Bike,
   CheckCheck,
-  MessageCircle,
   Printer,
   ArrowLeft,
   AlertCircle,
@@ -21,12 +20,10 @@ import {
 interface OrderTrackingClientProps {
   initialOrder: Order;
   paymentSettings?: PaymentSettings;
-  whatsappUrl: string;
 }
 
 export default function OrderTrackingClient({
   initialOrder,
-  whatsappUrl,
 }: OrderTrackingClientProps) {
   const [order, setOrder] = useState<Order>(initialOrder);
   const [refreshing, setRefreshing] = useState(false);
@@ -144,24 +141,6 @@ export default function OrderTrackingClient({
           </p>
         </div>
 
-        {/* WhatsApp Synchronization CTA */}
-        <div className="p-4 rounded-2xl bg-emerald-950/60 border border-emerald-600/40 max-w-lg mx-auto text-center space-y-2.5">
-          <p className="text-xs text-zinc-300">
-            For fastest service, sync your order details directly to the restaurant kitchen on WhatsApp:
-          </p>
-          <a
-            href={whatsappUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center justify-center gap-2 w-full py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-600 to-green-500 hover:from-emerald-500 text-white font-bold text-sm shadow-md transition-all active:scale-95"
-          >
-            <MessageCircle className="w-5 h-5 fill-white" />
-            <span>Send Order to WhatsApp (+92 314 1915087)</span>
-          </a>
-          <p className="text-[11px] text-zinc-400 italic">
-            * Note: When WhatsApp opens, remember to press <strong>Send</strong>.
-          </p>
-        </div>
       </div>
 
       {/* Live Order Timeline */}
@@ -270,10 +249,10 @@ export default function OrderTrackingClient({
               OFFICIAL RECEIPT
             </span>
             <h3 className="text-xl font-black text-white font-heading">
-              GRILLVI Lahore
+              Restaurant Name
             </h3>
             <p className="text-xs text-zinc-400">
-              Main Grand Trunk Road, Baghbanpura, Lahore • +92 314 1915087
+              Online Order Receipt
             </p>
           </div>
 

@@ -1,145 +1,57 @@
-# GRILLVI — BBQ. RICE. KARAHI (Lahore, Pakistan)
+# Restaurant Website Template
 
-A modern, full-stack, responsive restaurant ordering website and management platform for **GRILLVI — BBQ. RICE. KARAHI**, located on Main Grand Trunk Road, near Sunny Pan Shop, Baghbanpura, Lahore, Pakistan.
+A responsive restaurant ordering website and management platform. Replace the sample menu and configure the restaurant information in the admin dashboard before publishing.
 
----
+## Features
 
-## 🌟 Key Features
+- Customer homepage, menu search and category filters, item details, portions, add-ons, cart, and checkout.
+- QR codes for menu items and printable labels.
+- Order tracking, customer receipts, and kitchen tickets.
+- Admin authentication, order and menu management, payment settings, review moderation, and restaurant settings.
+- Daily sales reports in the `Asia/Karachi` timezone, including payment and item breakdowns, CSV export, and print.
+- Optional Supabase persistence for admin credentials, payment settings, and orders.
 
-### 1. Customer Frontend
-- **Homepage**: Hero banner featuring authentic BBQ and Thaal imagery, restaurant brand story, featured chef dishes, Thaal deals, customer review highlights (4.8/5 historical rating from 88 reviews), Google Maps directions, opening hours, and direct WhatsApp ordering.
-- **Menu System (`/menu`)**:
-  - 10 distinct categories (Starters, Pasta, BBQ Special, Pakistani Corner, BBQ Platter, Thaal Collection, Tandoor, Drinks & Water, Add-ons, Quick Sweet).
-  - Real-time search and instant category filter pills.
-  - Portion size variants (e.g. Half vs Full, 1L vs 1.5L) and customizable add-ons.
-- **Individual Food Detail Pages (`/menu/item/[id]`)**:
-  - High-res dish imagery, descriptions, portion selector, add-on selector.
-  - **Automatic QR Code Generation**: Download high-resolution PNG or SVG, and printable label with product title and price.
-- **Interactive Cart & Drawer (`/cart`)**:
-  - Instant quantity controls, line item calculations, persistent localStorage syncing.
-- **Checkout & Ordering (`/checkout`)**:
-  - Home Delivery vs Takeaway / Self-Pickup toggle.
-  - Validation of Pakistani mobile phone formats.
-  - Strict server-side recalculation of prices (client-submitted prices are never trusted).
-  - Four Pakistan payment methods (Easypaisa, JazzCash, Meezan Bank Transfer, Cash on Delivery).
-  - Receipt / payment slip upload support.
-- **Live Order Tracking (`/orders/[id]`)**:
-  - Live status pipeline: `Order Placed` ➔ `Confirmed` ➔ `Preparing` ➔ `Out for Delivery / Ready for Pickup` ➔ `Completed`.
-  - Payment verification badge.
-  - One-tap WhatsApp synchronization button with properly URL-encoded order details.
-  - Printable official customer receipt and kitchen order ticket (KOT).
-- **Customer Reviews (`/reviews`)**:
-  - Historical Google rating showcase (4.8/5 from 88 reviews).
-  - Customer review submission form with anti-spam moderation.
-- **About GRILLVI (`/about`)**:
-  - Story of GT Road heritage, live charcoal grill traditions, and the legendary Thaal sharing feasts.
-- **Contact & Location (`/contact`)**:
-  - Address: Main Grand Trunk Road, near Sunny Pan Shop, Baghbanpura, Lahore.
-  - Google Maps Plus Code: `H9JF+8R Lahore, Pakistan`.
-  - Embedded Google Map, directions button, click-to-call link, and WhatsApp chat.
+## Technology
 
----
+- Next.js 15 App Router, React 19, and TypeScript
+- Tailwind CSS and Lucide icons
+- Local JSON storage for development; Supabase persistence for selected production data
 
-### 2. Secure Admin Management Suite (`/admin`)
+## Getting started
 
-- **Secure Authentication**:
-  - Dedicated login at `/admin/login` with brute-force rate limiting.
-  - Password hashed using `bcrypt` and session managed via secure `HttpOnly` JWT cookie.
-  - Initial admin credentials are configured using `ADMIN_DEFAULT_USER` and `ADMIN_DEFAULT_PASS` environment variables.
-  - Secure in-dashboard password update modal.
-- **Overview Dashboard**:
-  - Total orders, today's orders, pending orders, orders in prep, dispatched, completed, cancelled.
-  - Total sales in PKR and best-selling items ranking.
-  - Pending payment verification count.
-- **Order Management**:
-  - Searchable, filterable live orders table.
-  - Order status switcher with automated audit logs.
-  - One-click payment verification for manual Easypaisa/JazzCash/Bank transfers.
-  - Printable Kitchen Order Ticket (KOT) and official receipt.
-- **Menu & Price Management**:
-  - Instantly update any food price or portion cost. Changes appear on the live website immediately without rebuild.
-  - Add new dishes with image upload (stored safely in `/public/uploads/`), portion sizes, add-ons, and categories.
-  - Mark dishes as available or sold-out with a single click.
-  - Delete or archive menu items.
-- **QR Code Hub**:
-  - Visual grid of permanent QR codes for every menu item.
-  - Filter by category.
-  - One-click PNG/SVG download.
-  - Printable multi-dish QR sticker sheet for table standees and packaging.
-- **Pakistan Payment Configuration**:
-  - Configure Easypaisa, JazzCash, and Meezan Bank account titles, numbers, IBAN, and instructions.
-  - Unconfigured or disabled transfer methods are hidden at checkout and rejected by the order API.
-  - Set default delivery fee, free delivery threshold, and minimum order values.
-- **Restaurant Information Management**:
-  - Update address, timings, phone, WhatsApp, and top announcement banner text.
-- **Review Moderation**:
-  - Approve or reject customer-submitted reviews before public display.
+1. Install dependencies:
 
----
+   ```bash
+   npm install
+   ```
 
-## 🛠️ Tech Stack
+2. Copy `.env.example` to `.env.local`, then set a unique `JWT_SECRET` (at least 32 characters) and `ADMIN_DEFAULT_PASS` (at least 12 characters). Never commit `.env.local`.
 
-- **Framework**: Next.js 15.1 (App Router) + React 19 + TypeScript
-- **Styling**: Tailwind CSS (Custom Luxury Black, Charcoal, Warm Gold, and Burnt Orange palette)
-- **Icons**: Lucide React
-- **QR Code Engine**: `qrcode` (PNG Buffer & SVG vector generator)
-- **Database Architecture**:
-  - Local development uses atomic JSON storage with memory caching in `.data/grillvi_db.json`.
-  - Admin credentials, payment settings, and orders use Supabase persistence when configured.
-  - The admin dashboard includes Pakistan-timezone daily revenue, order, payment-method, and best-selling-item reports, with CSV export and print support.
-- **Security**: `bcryptjs` password hashing, `jsonwebtoken` HttpOnly cookies, rate limiting, and server-side pricing validation.
+3. Start the development server:
 
----
+   ```bash
+   npm run dev
+   ```
 
-## 🚀 Getting Started
+   Open the URL printed by Next.js (usually [http://localhost:3000](http://localhost:3000)).
 
-### 1. Install Dependencies
-```bash
-npm install
-```
+4. Sign in at `/admin/login` and configure the restaurant name, tagline, contact details, address, opening hours, menu, and payment options before publishing.
 
-### 2. Environment Variables
-Copy `.env.example` to `.env.local`:
-```bash
-cp .env.example .env.local
-```
-Before starting the app, set a unique `JWT_SECRET` of at least 32 characters and an `ADMIN_DEFAULT_PASS` of at least 12 characters. Never commit `.env.local`.
+## Supabase on Vercel
 
-### Supabase persistence for Vercel
+Vercel's serverless filesystem is not durable. To persist admin credentials, payment settings, and orders:
 
-Admin credentials, payment settings, and orders need durable storage; Vercel's serverless filesystem cannot provide it.
+1. Run `supabase/schema.sql` in the Supabase SQL Editor for a new database. For an existing database, also run `supabase/migrations/20261022_grillvi_order_records.sql`.
+2. Set `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` in Vercel. Keep the service-role key server-side; do not use a `NEXT_PUBLIC_` variable.
+3. Set `JWT_SECRET`, `ADMIN_DEFAULT_USER`, and `ADMIN_DEFAULT_PASS` in Vercel and redeploy.
 
-1. For a new Supabase project, run [`supabase/schema.sql`](./supabase/schema.sql) in its SQL Editor. For an existing project, run [`supabase/migrations/20261022_grillvi_order_records.sql`](./supabase/migrations/20261022_grillvi_order_records.sql) to add the durable orders table.
-2. In the Vercel project settings, add `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` for the production environment. Keep the service-role key server-side only; never use a `NEXT_PUBLIC_` variable for it.
-3. Keep `JWT_SECRET`, `ADMIN_DEFAULT_USER`, and `ADMIN_DEFAULT_PASS` set in Vercel, then redeploy.
-4. The first admin login initializes the persistent credential record from the configured default credentials. Payment transfers start disabled and blank; configure approved account details in Admin → Payments.
+Menu edits, restaurant settings, reviews, and uploaded files still use local JSON/filesystem storage and are not durable on Vercel. Existing local orders are not imported automatically.
 
-Once Supabase is configured, new orders and order-status/payment updates use `grillvi_order_records`; the daily report reads from that durable store. Existing orders in local `.data/grillvi_db.json` are not automatically imported. Menu edits, restaurant settings, reviews, and uploaded files still use local JSON/filesystem storage and are **not durable on Vercel**; they require separate database/object-storage migrations.
+## Checks and production build
 
-### 3. Run Automated Tests
 ```bash
 node scripts/verify-grillvi.mjs
-```
-
-### 4. Start Development Server
-```bash
-npm run dev
-```
-Open [http://localhost:3000](http://localhost:3000) in your browser.
-
-### 5. Production Build
-```bash
 npm run build
-npm run start
 ```
 
----
-
-## 📍 Restaurant Details
-
-- **Restaurant Name**: GRILLVI
-- **Tagline**: BBQ. RICE. KARAHI
-- **Phone / WhatsApp**: +92 314 1915087
-- **Address**: Main Grand Trunk Road, near Sunny Pan Shop, Baghbanpura, Lahore, 54920, Pakistan
-- **Google Maps Location**: H9JF+8R Lahore, Pakistan
-- **Currency**: Pakistani Rupees (PKR / Rs)
+Internal storage names and the migration filename still contain the original project identifier for compatibility.

@@ -1,13 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import {
-  Flame,
-  Utensils,
-  MessageCircle,
-  Sparkles,
-  ArrowRight,
-} from 'lucide-react';
+import { Flame, Utensils, Sparkles, ArrowRight } from 'lucide-react';
 
 export default function AboutPage() {
   return (
@@ -16,13 +10,13 @@ export default function AboutPage() {
       <div className="text-center max-w-3xl mx-auto space-y-4">
         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-grill-card border border-grill-gold/40 text-xs font-bold text-grill-gold">
           <Flame className="w-3.5 h-3.5 text-grill-orange animate-pulse" />
-          <span>OUR STORY & HERITAGE</span>
+          <span>OUR STORY</span>
         </div>
         <h1 className="text-4xl sm:text-5xl font-black text-white font-heading">
-          About GRILLVI
+          About Restaurant Name
         </h1>
         <p className="text-base sm:text-lg text-zinc-300 leading-relaxed">
-          Crafting live charcoal BBQ, fragrant spiced rice Thaals, and sizzling handi karahis in the historic heart of Baghbanpura, Lahore.
+          Share your restaurant story, signature dishes, and the experience guests can expect.
         </p>
       </div>
 
@@ -30,10 +24,10 @@ export default function AboutPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
         <div className="space-y-6 text-sm sm:text-base text-zinc-300 leading-relaxed">
           <h2 className="text-2xl sm:text-3xl font-black text-white font-heading">
-            Born from Lahore&apos;s Passion for Pure Charcoal Smoke
+            Made Fresh, Served with Care
           </h2>
           <p>
-            Grand Trunk Road has been the lifeline of trade, culture, and rich culinary feasts for centuries. Located near Sunny Pan Shop in Baghbanpura, <strong className="text-white">GRILLVI</strong> was established to bring premium, uncompromised live barbecue and traditional Lahori handi cooking into a contemporary dining destination.
+            <strong className="text-white">Restaurant Name</strong> is a customizable restaurant profile. Replace this introduction with your own history, values, and what makes your kitchen special.
           </p>
           <p>
             Our core philosophy is simple: <strong className="text-grill-gold">Never pre-cook, never microwave, and never cut corners on meat quality.</strong> Every single skewer of Chicken Malai Boti, every beef seekh kabab, and every sizzling wok of Chicken Karahi is prepared fresh to your order over live natural charcoal embers.
@@ -62,8 +56,8 @@ export default function AboutPage() {
         {/* Interior Sign Image */}
         <div className="relative aspect-[4/3] rounded-3xl overflow-hidden border border-grill-border shadow-2xl bg-zinc-900">
           <Image
-            src="/images/restaurant-interior.jpg"
-            alt="GRILLVI dining hall and neon sign"
+            src="/images/chicken-karahi.jpg"
+            alt="Restaurant signature sharing meal"
             fill
             className="object-cover"
           />
@@ -121,8 +115,8 @@ export default function AboutPage() {
       <div className="p-8 sm:p-12 rounded-3xl bg-grill-card border border-grill-border grid grid-cols-1 lg:grid-cols-2 gap-8 items-center shadow-card">
         <div className="relative aspect-[4/3] rounded-2xl overflow-hidden border border-grill-gold/30 shadow-xl bg-zinc-900">
           <Image
-            src="/images/grillvi-jumbo-thaal.jpg"
-            alt="GRILLVI Jumbo Feast Thaal"
+            src="/images/family-sharing-thaal.jpg"
+            alt="Family sharing thaal"
             fill
             className="object-cover"
           />
@@ -150,29 +144,20 @@ export default function AboutPage() {
         </div>
       </div>
 
-      {/* Visit Info Box */}
+      {/* Template Setup Prompt */}
       <div className="p-8 rounded-3xl bg-grill-dark border border-grill-border text-center space-y-4 max-w-2xl mx-auto">
-        <h3 className="text-xl font-bold text-white font-heading">
-          Join Us Tonight on GT Road
-        </h3>
-        <p className="text-xs sm:text-sm text-zinc-400">
-          Main Grand Trunk Road, near Sunny Pan Shop, Baghbanpura, Lahore • Open 3:00 PM to 1:00 AM
-        </p>
-        <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
-          <a
-            href="https://wa.me/923141915087"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-2 shadow-md transition-colors"
-          >
-            <MessageCircle className="w-4 h-4" />
-            <span>Chat on WhatsApp</span>
-          </a>
-          <Link
-            href="/menu"
-            className="px-6 py-3 rounded-xl bg-grill-card hover:bg-zinc-800 text-grill-gold border border-grill-gold/40 font-bold text-xs transition-colors"
-          >
-            Order Online Now
+      <h3 className="text-xl font-bold text-white font-heading">
+        Tell Your Restaurant Story
+      </h3>
+      <p className="text-xs sm:text-sm text-zinc-400">
+        Customize this page with your restaurant&apos;s location-free introduction and signature offerings.
+      </p>
+      <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
+        <Link
+          href="/admin/login"
+          className="px-6 py-3 rounded-xl bg-grill-card hover:bg-zinc-800 text-grill-gold border border-grill-gold/40 font-bold text-xs transition-colors"
+        >
+          Open Admin Portal
           </Link>
         </div>
       </div>

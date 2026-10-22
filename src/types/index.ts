@@ -202,11 +202,6 @@ export interface RestaurantSettings {
     instagram?: string;
     tiktok?: string;
   };
-  googleHistoricalRating: {
-    rating: number;
-    reviewCount: number;
-    sourceNote: string;
-  };
 }
 
 export interface Review {

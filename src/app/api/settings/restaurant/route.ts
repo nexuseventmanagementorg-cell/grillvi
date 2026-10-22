@@ -3,6 +3,11 @@ import { getRestaurantSettings, updateRestaurantSettings } from '@/lib/db';
 import { getSessionAdmin } from '@/lib/auth';
 
 export async function GET() {
+  const session = await getSessionAdmin();
+  if (!session) {
+    return NextResponse.json({ error: 'Unauthorized.' }, { status: 401 });
+  }
+
   try {
     const settings = getRestaurantSettings();
     return NextResponse.json({ success: true, settings });

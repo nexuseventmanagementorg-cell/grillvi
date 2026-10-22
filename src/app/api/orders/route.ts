@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getOrders, createOrder, getPaymentSettings } from '@/lib/db';
 import { calculateOrderPricing } from '@/lib/pricing';
-import { buildWhatsAppLink, buildWhatsAppOrderMessage } from '@/lib/whatsapp';
 import { getSessionAdmin } from '@/lib/auth';
 import { initialPaymentSettings } from '@/lib/initialData';
 import {
@@ -25,7 +24,7 @@ function generateOrderId(): string {
   const year = date.getFullYear().toString().slice(-2);
   const month = (date.getMonth() + 1).toString().padStart(2, '0');
   const randomNum = Math.floor(1000 + Math.random() * 9000);
-  return `GV-${year}${month}-${randomNum}`;
+  return `ORD-${year}${month}-${randomNum}`;
 }
 
 export async function GET(req: NextRequest) {
@@ -54,7 +53,6 @@ export async function POST(req: NextRequest) {
     const {
       customerName,
       phone,
-      whatsappNumber,
       orderType,
       deliveryAddress,
       addressNotes,
@@ -75,7 +73,7 @@ export async function POST(req: NextRequest) {
 
     if (!phone || phone.trim().length < 10) {
       return NextResponse.json(
-        { error: 'Please provide a valid phone number (e.g. 0314 1915087).' },
+        { error: 'Please provide a valid mobile phone number.' },
         { status: 400 }
       );
     }
@@ -139,7 +137,6 @@ export async function POST(req: NextRequest) {
       id: orderId,
       customerName: customerName.trim(),
       phone: phone.trim(),
-      whatsappNumber: whatsappNumber ? whatsappNumber.trim() : undefined,
       orderType: type,
       deliveryAddress: type === 'delivery' ? deliveryAddress.trim() : undefined,
       addressNotes: addressNotes ? addressNotes.trim() : undefined,
@@ -168,17 +165,11 @@ export async function POST(req: NextRequest) {
 
     const savedOrder = await createOrder(newOrder);
 
-    // Build WhatsApp URL
-    const whatsappUrl = buildWhatsAppLink(savedOrder);
-    const whatsappMessage = buildWhatsAppOrderMessage(savedOrder);
-
     return NextResponse.json(
       {
         success: true,
         message: 'Order created successfully!',
         order: savedOrder,
-        whatsappUrl,
-        whatsappMessage,
       },
       { status: 201 }
     );

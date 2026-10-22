@@ -5,7 +5,6 @@ import { Review } from '@/types';
 import StarRating from '@/components/StarRating';
 import {
   MessageSquarePlus,
-  ExternalLink,
   ShieldCheck,
   CheckCircle2,
   AlertCircle,
@@ -92,7 +91,7 @@ export default function ReviewsPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12">
-      {/* Header & Historical Google Rating Hero */}
+      {/* Review Summary */}
       <div className="p-8 sm:p-12 rounded-3xl bg-grill-card border border-grill-border flex flex-col md:flex-row items-center justify-between gap-8 shadow-card">
         <div className="space-y-4 text-center md:text-left">
           <span className="text-xs font-bold uppercase tracking-widest text-grill-gold flex items-center justify-center md:justify-start gap-1.5">
@@ -102,31 +101,37 @@ export default function ReviewsPage() {
             Customer Reviews & Experiences
           </h1>
           <p className="text-sm text-zinc-300 max-w-xl leading-relaxed">
-            Read what food lovers across Lahore say about GRILLVI&apos;s live charcoal platters, authentic karahis, and grand Thaal feasts.
+            Read guest feedback and share your own experience.
           </p>
         </div>
 
-        {/* Historical Google Rating Badge */}
+        {/* Current review summary */}
         <div className="p-6 rounded-2xl bg-grill-dark border border-grill-gold/40 text-center space-y-3 min-w-[260px] shadow-gold">
           <div className="flex items-center justify-center gap-2">
-            <span className="text-4xl font-black text-white font-mono">4.8</span>
+            <span className="text-4xl font-black text-white font-mono">
+              {reviews.length
+                ? (
+                    reviews.reduce((sum, review) => sum + review.rating, 0) /
+                    reviews.length
+                  ).toFixed(1)
+                : '—'}
+            </span>
             <div className="text-left">
-              <StarRating rating={5} size="sm" />
-              <span className="text-[11px] text-zinc-400 block mt-0.5">out of 5 stars</span>
+              <StarRating
+                rating={reviews.length
+                  ? Math.round(
+                      reviews.reduce((sum, review) => sum + review.rating, 0) /
+                        reviews.length
+                    )
+                  : 0}
+                size="sm"
+              />
+              <span className="text-[11px] text-zinc-400 block mt-0.5">average guest rating</span>
             </div>
           </div>
           <p className="text-xs text-zinc-300">
-            Historical rating recorded from <strong>88 Google Reviews</strong>
+            Based on <strong>{reviews.length} approved review(s)</strong>
           </p>
-          <a
-            href="https://www.google.com/maps/search/?api=1&query=Grillvi+Main+Grand+Trunk+Road+Baghbanpura+Lahore+Pakistan"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center justify-center gap-1.5 py-2 px-4 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-xs font-semibold text-grill-gold transition-colors w-full border border-zinc-700"
-          >
-            <span>View on Google Maps</span>
-            <ExternalLink className="w-3.5 h-3.5" />
-          </a>
         </div>
       </div>
 
@@ -165,9 +170,7 @@ export default function ReviewsPage() {
                       <div className="flex items-center gap-2 mt-1">
                         <StarRating rating={rev.rating} size="sm" />
                         <span className="text-[11px] text-zinc-400">
-                          {rev.source === 'google_historical'
-                            ? 'Google Maps Review'
-                            : 'Website Customer Review'}
+                          Customer Review
                         </span>
                       </div>
                     </div>
@@ -208,7 +211,7 @@ export default function ReviewsPage() {
             </div>
 
             <p className="text-xs text-zinc-400 leading-relaxed">
-              Dined with us or ordered home delivery? Tell us how your BBQ, karahi and service was!
+              Share feedback about your visit, order, or favorite menu item.
             </p>
 
             {successMessage && (
@@ -261,7 +264,7 @@ export default function ReviewsPage() {
                 </label>
                 <input
                   type="text"
-                  placeholder="e.g. Grillvi Special Thaal / Chicken White Karahi"
+                  placeholder="e.g. Sharing Thaal / Chicken White Karahi"
                   value={dishRecommended}
                   onChange={(e) => setDishRecommended(e.target.value)}
                   className="w-full px-3.5 py-2.5 rounded-xl bg-grill-dark border border-zinc-800 focus:border-grill-gold focus:outline-none text-white text-xs"
@@ -274,7 +277,7 @@ export default function ReviewsPage() {
                 </label>
                 <input
                   type="text"
-                  placeholder="e.g. GV-2610-8421"
+                  placeholder="e.g. ORD-2610-8421"
                   value={orderId}
                   onChange={(e) => setOrderId(e.target.value)}
                   className="w-full px-3.5 py-2.5 rounded-xl bg-grill-dark border border-zinc-800 focus:border-grill-gold focus:outline-none text-white text-xs font-mono"
@@ -306,7 +309,7 @@ export default function ReviewsPage() {
               <div className="flex items-center gap-1.5 text-[10px] text-zinc-500 pt-1">
                 <ShieldCheck className="w-3.5 h-3.5 text-grill-gold flex-shrink-0" />
                 <span>
-                  All submitted reviews undergo anti-spam moderation by GRILLVI management.
+                  All submitted reviews are moderated before appearing on the website.
                 </span>
               </div>
             </form>

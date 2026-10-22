@@ -398,7 +398,7 @@ export function getReviews(approvedOnly: boolean = true): Review[] {
     reviews = reviews.filter((r) => r.status === 'approved');
   }
 
-  return reviews;
+  return reviews.filter((review) => review.source !== 'google_historical');
 }
 
 export function createReview(

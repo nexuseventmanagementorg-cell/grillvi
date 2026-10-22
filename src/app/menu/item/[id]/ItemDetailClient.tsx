@@ -287,7 +287,7 @@ export default function ItemDetailClient({
         {/* QR Code Container (Printable Label) */}
         <div id="printable-qr-label" className="bg-white p-5 rounded-2xl shadow-xl text-center text-black flex flex-col items-center flex-shrink-0">
           <span className="text-[11px] font-black tracking-widest text-black uppercase mb-1">
-            GRILLVI LAHORE
+            Restaurant Name
           </span>
           <img
             src={qrDataUrl}
@@ -315,13 +315,13 @@ export default function ItemDetailClient({
           </h3>
 
           <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed">
-            Every dish on GRILLVI has its own permanent product identifier and QR code. Print this QR label for table stands, takeaway bags, or flyers so diners can immediately open this exact item, configure portion sizes, and order online.
+            Every dish has its own product identifier and QR code. Print this label for table stands, takeaway bags, or flyers so guests can open this item, configure portions, and order online.
           </p>
 
           <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 pt-2">
             <a
               href={`/api/qr/${item.id}?format=png`}
-              download={`grillvi-qr-${item.slug}.png`}
+              download={`restaurant-qr-${item.slug}.png`}
               className="px-4 py-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-bold border border-zinc-700 flex items-center gap-2 transition-colors"
             >
               <Download className="w-4 h-4 text-grill-gold" />

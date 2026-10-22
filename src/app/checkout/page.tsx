@@ -30,8 +30,6 @@ export default function CheckoutPage() {
   // Form State
   const [customerName, setCustomerName] = useState('');
   const [phone, setPhone] = useState('');
-  const [whatsappNumber, setWhatsappNumber] = useState('');
-  const [usePhoneForWhatsApp, setUsePhoneForWhatsApp] = useState(true);
   const [orderType, setOrderType] = useState<OrderType>('delivery');
   const [deliveryAddress, setDeliveryAddress] = useState('');
   const [addressNotes, setAddressNotes] = useState('');
@@ -111,7 +109,7 @@ export default function CheckoutPage() {
       setErrorMessage(
         err instanceof Error
           ? err.message
-          : 'Could not upload payment slip. You can also share it directly on WhatsApp.'
+          : 'Could not upload payment slip. Please try again.'
       );
     } finally {
       setUploadingReceipt(false);
@@ -140,7 +138,7 @@ export default function CheckoutPage() {
     }
 
     if (!phone.trim() || phone.trim().length < 10) {
-      setErrorMessage('Please enter a valid Pakistani phone number (e.g., 0314 1915087).');
+      setErrorMessage('Please enter a valid mobile phone number.');
       return;
     }
 
@@ -164,7 +162,6 @@ export default function CheckoutPage() {
       const payload = {
         customerName: customerName.trim(),
         phone: phone.trim(),
-        whatsappNumber: usePhoneForWhatsApp ? phone.trim() : whatsappNumber.trim(),
         orderType,
         deliveryAddress: orderType === 'delivery' ? deliveryAddress.trim() : undefined,
         addressNotes: addressNotes.trim() || undefined,
@@ -280,7 +277,7 @@ export default function CheckoutPage() {
             </div>
             {orderType === 'takeaway' && (
               <p className="text-xs text-zinc-400 bg-grill-dark p-3 rounded-xl border border-zinc-800">
-                📍 Takeaway address: <strong>Main Grand Trunk Road, near Sunny Pan Shop, Baghbanpura, Lahore</strong>. You will receive an alert when your order is packed!
+                Pickup instructions will be provided by the restaurant.
               </p>
             )}
           </div>
@@ -318,41 +315,13 @@ export default function CheckoutPage() {
                   <input
                     type="tel"
                     required
-                    placeholder="0314 1915087"
+                    placeholder="Enter mobile number"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-grill-dark border border-zinc-800 focus:border-grill-gold focus:outline-none text-white text-sm"
                   />
                 </div>
               </div>
-            </div>
-
-            {/* WhatsApp option */}
-            <div className="space-y-2 pt-1">
-              <label className="flex items-center gap-2 cursor-pointer text-xs text-zinc-300">
-                <input
-                  type="checkbox"
-                  checked={usePhoneForWhatsApp}
-                  onChange={(e) => setUsePhoneForWhatsApp(e.target.checked)}
-                  className="accent-grill-gold"
-                />
-                <span>WhatsApp number is the same as my mobile number</span>
-              </label>
-
-              {!usePhoneForWhatsApp && (
-                <div>
-                  <label className="text-xs font-semibold text-zinc-300 block mb-1.5">
-                    Different WhatsApp Number
-                  </label>
-                  <input
-                    type="tel"
-                    placeholder="0300 1234567"
-                    value={whatsappNumber}
-                    onChange={(e) => setWhatsappNumber(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl bg-grill-dark border border-zinc-800 focus:border-grill-gold focus:outline-none text-white text-sm"
-                  />
-                </div>
-              )}
             </div>
 
             {/* Delivery address (if delivery) */}
@@ -367,7 +336,7 @@ export default function CheckoutPage() {
                     <textarea
                       required
                       rows={2}
-                      placeholder="House number, Street name, Mohalla, Area (e.g., House 14, Street 2, Baghbanpura)"
+                      placeholder="Street, area, city"
                       value={deliveryAddress}
                       onChange={(e) => setDeliveryAddress(e.target.value)}
                       className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-grill-dark border border-zinc-800 focus:border-grill-gold focus:outline-none text-white text-sm"
@@ -381,7 +350,7 @@ export default function CheckoutPage() {
                   </label>
                   <input
                     type="text"
-                    placeholder="e.g. Near Sunny Pan Shop, Opposite Shell Pump"
+                    placeholder="Nearby landmark or delivery instructions"
                     value={addressNotes}
                     onChange={(e) => setAddressNotes(e.target.value)}
                     className="w-full px-4 py-2.5 rounded-xl bg-grill-dark border border-zinc-800 focus:border-grill-gold focus:outline-none text-white text-sm"
@@ -513,7 +482,7 @@ export default function CheckoutPage() {
                   <CreditCard className="w-4 h-4 text-red-400" />
                 </div>
                 <p className="text-xs text-zinc-400">
-                  Fast mobile transfer to GRILLVI JazzCash account.
+                  Fast mobile transfer using the account details configured by the restaurant.
                 </p>
               </label>
               )}
@@ -655,7 +624,7 @@ export default function CheckoutPage() {
                     )}
                   </div>
                   <p className="text-[11px] text-zinc-500 mt-1">
-                    * If you don&apos;t have the screenshot now, you can also send it to our WhatsApp after placing the order.
+                    Upload your payment receipt here so the restaurant can verify your order.
                   </p>
                 </div>
               </div>
@@ -756,7 +725,7 @@ export default function CheckoutPage() {
             </button>
 
             <p className="text-[11px] text-zinc-500 text-center leading-relaxed">
-              By confirming, your order is safely registered in our database. You will also get a one-tap WhatsApp sync option.
+              By confirming, your order will be registered and you can track its status on the next page.
             </p>
           </div>
         </div>
