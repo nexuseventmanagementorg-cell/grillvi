@@ -9,7 +9,7 @@ export async function GET() {
   }
 
   try {
-    const metrics = getDashboardMetrics();
+    const metrics = await getDashboardMetrics();
     return NextResponse.json({ success: true, metrics });
   } catch (err) {
     console.error('Error fetching admin metrics:', err);

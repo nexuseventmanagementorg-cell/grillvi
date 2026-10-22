@@ -40,7 +40,7 @@ export async function GET(req: NextRequest) {
     const paymentMethod = searchParams.get('paymentMethod') || undefined;
     const search = searchParams.get('search') || undefined;
 
-    const orders = getOrders({ status, paymentMethod, search });
+    const orders = await getOrders({ status, paymentMethod, search });
     return NextResponse.json({ success: true, count: orders.length, orders });
   } catch (err) {
     console.error('Error fetching orders:', err);
@@ -166,7 +166,7 @@ export async function POST(req: NextRequest) {
       updatedAt: now,
     };
 
-    const savedOrder = createOrder(newOrder);
+    const savedOrder = await createOrder(newOrder);
 
     // Build WhatsApp URL
     const whatsappUrl = buildWhatsAppLink(savedOrder);

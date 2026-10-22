@@ -127,6 +127,23 @@ export interface Order {
   updatedAt: string;
 }
 
+export interface DailySalesReport {
+  date: string;
+  orderCount: number;
+  revenue: number;
+  averageOrderValue: number;
+  completedOrders: number;
+  cancelledOrders: number;
+  pendingOrders: number;
+  paymentBreakdown: Array<{
+    method: PaymentMethod;
+    orders: number;
+    revenue: number;
+  }>;
+  topItems: Array<{ id: string; name: string; quantity: number; revenue: number }>;
+  orders: Order[];
+}
+
 export interface PaymentAccountConfig {
   enabled: boolean;
   accountTitle: string;

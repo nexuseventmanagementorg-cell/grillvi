@@ -20,6 +20,14 @@ import {
   getInitialAdminUser,
 } from './initialData';
 import { deployedMenuImages } from './deployedMenuImages';
+import { isPersistentSettingsConfigured } from './persistentSettings';
+import {
+  createPersistentOrder,
+  readPersistentOrder,
+  readPersistentOrders,
+  updatePersistentOrder,
+} from './orderPersistence';
+import { createDailySalesReport, getBusinessDate } from './salesReports';
 
 export interface DatabaseSchema {
   version: number;
@@ -270,53 +278,61 @@ export function getOrders(filters?: {
   status?: string;
   paymentMethod?: string;
   search?: string;
-}): Order[] {
-  const db = loadDatabase();
-  let orders = [...db.orders].sort(
+}): Promise<Order[]> {
+  return readPersistentOrders().then((persistentOrders) => {
+    let orders = [...(persistentOrders ?? loadDatabase().orders)].sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   );
 
-  if (filters?.status && filters.status !== 'all') {
-    orders = orders.filter((o) => o.orderStatus === filters.status);
-  }
+    if (filters?.status && filters.status !== 'all') {
+      orders = orders.filter((o) => o.orderStatus === filters.status);
+    }
 
-  if (filters?.paymentMethod && filters.paymentMethod !== 'all') {
-    orders = orders.filter((o) => o.paymentMethod === filters.paymentMethod);
-  }
+    if (filters?.paymentMethod && filters.paymentMethod !== 'all') {
+      orders = orders.filter((o) => o.paymentMethod === filters.paymentMethod);
+    }
 
-  if (filters?.search) {
-    const q = filters.search.toLowerCase().trim();
-    orders = orders.filter(
-      (o) =>
-        o.id.toLowerCase().includes(q) ||
-        o.customerName.toLowerCase().includes(q) ||
-        o.phone.toLowerCase().includes(q)
-    );
-  }
+    if (filters?.search) {
+      const q = filters.search.toLowerCase().trim();
+      orders = orders.filter(
+        (o) =>
+          o.id.toLowerCase().includes(q) ||
+          o.customerName.toLowerCase().includes(q) ||
+          o.phone.toLowerCase().includes(q)
+      );
+    }
 
-  return orders;
+    return orders;
+  });
 }
 
-export function getOrderById(id: string): Order | null {
+export async function getOrderById(id: string): Promise<Order | null> {
+  const persistentOrder = await readPersistentOrder(id);
+  if (persistentOrder !== undefined) return persistentOrder;
+
   const db = loadDatabase();
   return db.orders.find((o) => o.id === id) || null;
 }
 
-export function createOrder(order: Order): Order {
+export async function createOrder(order: Order): Promise<Order> {
+  if (isPersistentSettingsConfigured()) {
+    await createPersistentOrder(order);
+    return order;
+  }
+
   const db = loadDatabase();
   db.orders.unshift(order);
   saveDatabase(db);
   return order;
 }
 
-export function updateOrderStatus(
+export async function updateOrderStatus(
   orderId: string,
   newStatus: OrderStatus,
   note?: string,
   updatedBy: string = 'admin'
-): Order | null {
-  const db = loadDatabase();
-  const order = db.orders.find((o) => o.id === orderId);
+): Promise<Order | null> {
+  const order = await getOrderById(orderId);
   if (!order) return null;
 
   order.orderStatus = newStatus;
@@ -328,17 +344,21 @@ export function updateOrderStatus(
     updatedBy,
   });
 
-  saveDatabase(db);
+  if (isPersistentSettingsConfigured()) {
+    await updatePersistentOrder(order);
+  } else {
+    const db = loadDatabase();
+    saveDatabase(db);
+  }
   return order;
 }
 
-export function verifyPayment(
+export async function verifyPayment(
   orderId: string,
   status: PaymentVerificationStatus,
   note?: string
-): Order | null {
-  const db = loadDatabase();
-  const order = db.orders.find((o) => o.id === orderId);
+): Promise<Order | null> {
+  const order = await getOrderById(orderId);
   if (!order) return null;
 
   order.paymentVerificationStatus = status;
@@ -355,7 +375,12 @@ export function verifyPayment(
     });
   }
 
-  saveDatabase(db);
+  if (isPersistentSettingsConfigured()) {
+    await updatePersistentOrder(order);
+  } else {
+    const db = loadDatabase();
+    saveDatabase(db);
+  }
   return order;
 }
 
@@ -489,46 +514,54 @@ export function recordAdminLogin(): void {
    ADMIN STATS & DASHBOARD METRICS
    ============================================================ */
 
-export function getDashboardMetrics() {
+export async function getDashboardMetrics() {
   const db = loadDatabase();
   const now = new Date();
-  const todayDateStr = now.toISOString().slice(0, 10);
+  const todayDateStr = getBusinessDate(now);
+  const orders = await getOrders();
 
-  const totalOrders = db.orders.length;
-  const todayOrders = db.orders.filter((o) =>
-    o.createdAt.startsWith(todayDateStr)
+  const totalOrders = orders.length;
+  const todayOrders = orders.filter((o) =>
+    getBusinessDate(new Date(o.createdAt)) === todayDateStr
   ).length;
+  const todayReport = createDailySalesReport(orders, todayDateStr);
+  const completedToday = todayReport.completedOrders;
 
-  const pendingOrders = db.orders.filter(
+  const pendingOrders = orders.filter(
     (o) => o.orderStatus === 'placed'
   ).length;
-  const confirmedOrders = db.orders.filter(
+  const confirmedOrders = orders.filter(
     (o) => o.orderStatus === 'confirmed'
   ).length;
-  const preparingOrders = db.orders.filter(
+  const preparingOrders = orders.filter(
     (o) => o.orderStatus === 'preparing'
   ).length;
-  const dispatchedOrders = db.orders.filter(
+  const dispatchedOrders = orders.filter(
     (o) => o.orderStatus === 'out_for_delivery' || o.orderStatus === 'ready_for_pickup'
   ).length;
-  const completedOrders = db.orders.filter(
+  const completedOrders = orders.filter(
     (o) => o.orderStatus === 'completed'
   ).length;
-  const cancelledOrders = db.orders.filter(
+  const cancelledOrders = orders.filter(
     (o) => o.orderStatus === 'cancelled'
   ).length;
 
-  const pendingPaymentVerifications = db.orders.filter(
+  const pendingPaymentVerifications = orders.filter(
     (o) => o.paymentVerificationStatus === 'pending_verification'
   ).length;
+  const actionNeededOrders = orders.filter(
+    (o) =>
+      o.orderStatus === 'placed' ||
+      o.paymentVerificationStatus === 'pending_verification'
+  ).length;
 
-  const totalSales = db.orders
+  const totalSales = orders
     .filter((o) => o.orderStatus !== 'cancelled')
     .reduce((sum, o) => sum + (o.totalAmount || 0), 0);
 
   // Calculate best-selling items
   const itemCounts: Record<string, { name: string; count: number; revenue: number }> = {};
-  db.orders.forEach((o) => {
+  orders.forEach((o) => {
     if (o.orderStatus !== 'cancelled') {
       o.items.forEach((item) => {
         if (!itemCounts[item.menuItemId]) {
@@ -548,11 +581,14 @@ export function getDashboardMetrics() {
     .sort((a, b) => b.count - a.count)
     .slice(0, 5);
 
-  const recentOrders = db.orders.slice(0, 8);
+  const recentOrders = orders.slice(0, 8);
 
   return {
     totalOrders,
     todayOrders,
+    todayRevenue: todayReport.revenue,
+    completedToday,
+    actionNeededOrders,
     pendingOrders,
     confirmedOrders,
     preparingOrders,

@@ -84,9 +84,9 @@ A modern, full-stack, responsive restaurant ordering website and management plat
 - **Icons**: Lucide React
 - **QR Code Engine**: `qrcode` (PNG Buffer & SVG vector generator)
 - **Database Architecture**:
-  - The current application database uses atomic JSON storage with memory caching in `.data/grillvi_db.json` for local development.
-  - Payment settings and admin credentials use Supabase persistence when configured.
-  - `supabase/schema.sql` contains the PostgreSQL schema; most application data has not yet been migrated from JSON storage.
+  - Local development uses atomic JSON storage with memory caching in `.data/grillvi_db.json`.
+  - Admin credentials, payment settings, and orders use Supabase persistence when configured.
+  - The admin dashboard includes Pakistan-timezone daily revenue, order, payment-method, and best-selling-item reports, with CSV export and print support.
 - **Security**: `bcryptjs` password hashing, `jsonwebtoken` HttpOnly cookies, rate limiting, and server-side pricing validation.
 
 ---
@@ -107,14 +107,14 @@ Before starting the app, set a unique `JWT_SECRET` of at least 32 characters and
 
 ### Supabase persistence for Vercel
 
-Payment settings and admin username/password changes need durable storage; Vercel's serverless filesystem cannot provide it. Before allowing those changes on a production deployment:
+Admin credentials, payment settings, and orders need durable storage; Vercel's serverless filesystem cannot provide it.
 
-1. Create a Supabase project and run [`supabase/schema.sql`](./supabase/schema.sql) in its SQL Editor.
+1. For a new Supabase project, run [`supabase/schema.sql`](./supabase/schema.sql) in its SQL Editor. For an existing project, run [`supabase/migrations/20261022_grillvi_order_records.sql`](./supabase/migrations/20261022_grillvi_order_records.sql) to add the durable orders table.
 2. In the Vercel project settings, add `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` for the production environment. Keep the service-role key server-side only; never use a `NEXT_PUBLIC_` variable for it.
 3. Keep `JWT_SECRET`, `ADMIN_DEFAULT_USER`, and `ADMIN_DEFAULT_PASS` set in Vercel, then redeploy.
 4. The first admin login initializes the persistent credential record from the configured default credentials. Payment transfers start disabled and blank; configure approved account details in Admin → Payments.
 
-Without Supabase configured, production payment-setting saves and admin credential changes return an error instead of claiming they were saved. Other data—including orders, menu edits, restaurant settings, reviews, and uploaded files—still uses local JSON/filesystem storage and is **not durable on Vercel**; it requires a separate database/object-storage migration.
+Once Supabase is configured, new orders and order-status/payment updates use `grillvi_order_records`; the daily report reads from that durable store. Existing orders in local `.data/grillvi_db.json` are not automatically imported. Menu edits, restaurant settings, reviews, and uploaded files still use local JSON/filesystem storage and are **not durable on Vercel**; they require separate database/object-storage migrations.
 
 ### 3. Run Automated Tests
 ```bash

@@ -13,12 +13,15 @@ import {
   PaymentSettings,
   RestaurantSettings,
   Review,
+  DailySalesReport,
 } from '@/types';
 import { formatPKR } from '@/lib/format';
+import { getBusinessDate, SALES_TIME_ZONE } from '@/lib/salesReports';
 import {
   LayoutDashboard,
   UtensilsCrossed,
   ShoppingBag,
+  CalendarDays,
   QrCode,
   CreditCard,
   Settings,
@@ -36,6 +39,8 @@ import {
   Trash2,
   Eye,
   KeyRound,
+  RefreshCw,
+  TrendingUp,
 } from 'lucide-react';
 
 export default function AdminDashboardPage() {
@@ -47,7 +52,7 @@ export default function AdminDashboardPage() {
 
   // Active Tab
   const [activeTab, setActiveTab] = useState<
-    'overview' | 'orders' | 'menu' | 'qr' | 'payments' | 'settings' | 'reviews'
+    'overview' | 'daily-sales' | 'orders' | 'menu' | 'qr' | 'payments' | 'settings' | 'reviews'
   >('overview');
 
   // Data States
@@ -69,6 +74,11 @@ export default function AdminDashboardPage() {
   const [isDishModalOpen, setIsDishModalOpen] = useState(false);
   const [editingDish, setEditingDish] = useState<MenuItem | null>(null);
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+  const [reportDate, setReportDate] = useState(() => getBusinessDate(new Date()));
+  const [dailyReport, setDailyReport] = useState<DailySalesReport | null>(null);
+  const [dailyReportLoading, setDailyReportLoading] = useState(false);
+  const [dailyReportError, setDailyReportError] = useState('');
+  const [reportRefreshKey, setReportRefreshKey] = useState(0);
 
   // Notifications
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -98,6 +108,39 @@ export default function AdminDashboardPage() {
     }
     verifyAuth();
   }, [router]);
+
+  useEffect(() => {
+    if (activeTab !== 'daily-sales') return;
+
+    let current = true;
+    setDailyReportLoading(true);
+    setDailyReportError('');
+
+    fetch(`/api/admin/sales?date=${encodeURIComponent(reportDate)}`)
+      .then(async (res) => {
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to load sales report.');
+        return data.report as DailySalesReport;
+      })
+      .then((report) => {
+        if (current) setDailyReport(report);
+      })
+      .catch((error: unknown) => {
+        if (current) {
+          setDailyReportError(
+            error instanceof Error ? error.message : 'Failed to load sales report.'
+          );
+          setDailyReport(null);
+        }
+      })
+      .finally(() => {
+        if (current) setDailyReportLoading(false);
+      });
+
+    return () => {
+      current = false;
+    };
+  }, [activeTab, reportDate, reportRefreshKey]);
 
   const loadAllData = async () => {
     try {
@@ -138,6 +181,51 @@ export default function AdminDashboardPage() {
   const handleLogout = async () => {
     await fetch('/api/auth/logout', { method: 'POST' });
     router.push('/admin/login');
+  };
+
+  const exportDailySalesCsv = () => {
+    if (!dailyReport) return;
+
+    const escapeCsv = (value: string | number) => {
+      let text = String(value);
+      if (/^[=+\-@\t\r]/.test(text)) text = `'${text}`;
+      return `"${text.replace(/"/g, '""')}"`;
+    };
+    const rows = [
+      [
+        'Order ID',
+        'Time (Pakistan)',
+        'Customer',
+        'Order Type',
+        'Items',
+        'Order Status',
+        'Payment Method',
+        'Payment Status',
+        'Total (PKR)',
+      ],
+      ...dailyReport.orders.map((order) => [
+        order.id,
+        new Intl.DateTimeFormat('en-PK', {
+          dateStyle: 'short',
+          timeStyle: 'short',
+          timeZone: SALES_TIME_ZONE,
+        }).format(new Date(order.createdAt)),
+        order.customerName,
+        order.orderType,
+        order.items.map((item) => `${item.name} x${item.quantity}`).join('; '),
+        order.orderStatus,
+        order.paymentMethod,
+        order.paymentVerificationStatus,
+        order.totalAmount,
+      ]),
+    ];
+    const csv = `\uFEFF${rows.map((row) => row.map(escapeCsv).join(',')).join('\r\n')}`;
+    const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `grillvi-daily-sales-${dailyReport.date}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
   };
 
   // Order Actions
@@ -382,6 +470,18 @@ export default function AdminDashboardPage() {
           </button>
 
           <button
+            onClick={() => setActiveTab('daily-sales')}
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
+              activeTab === 'daily-sales'
+                ? 'bg-grill-gold text-grill-black shadow-gold'
+                : 'text-zinc-400 hover:text-white hover:bg-zinc-800'
+            }`}
+          >
+            <CalendarDays className="w-4 h-4" />
+            <span>Daily Sales</span>
+          </button>
+
+          <button
             onClick={() => setActiveTab('menu')}
             className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
               activeTab === 'menu'
@@ -451,49 +551,57 @@ export default function AdminDashboardPage() {
         {activeTab === 'overview' && metrics && (
           <div className="space-y-8">
             {/* Top Metric Cards Grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-5 gap-4">
               <div className="p-5 rounded-2xl bg-grill-card border border-grill-border space-y-1">
                 <span className="text-[11px] font-semibold text-zinc-400 uppercase">
-                  Total Orders
+                  Today&apos;s Orders
                 </span>
                 <p className="text-2xl font-black text-white font-mono">
-                  {metrics.totalOrders}
+                  {metrics.todayOrders}
+                </p>
+                <span className="text-[10px] text-zinc-500">Pakistan local date</span>
+              </div>
+
+              <div className="p-5 rounded-2xl bg-grill-card border border-grill-border space-y-1">
+                <span className="text-[11px] font-semibold text-zinc-400 uppercase">
+                  Today&apos;s Revenue
+                </span>
+                <p className="text-2xl font-black text-grill-gold font-mono">
+                  {formatPKR(metrics.todayRevenue)}
+                </p>
+                <span className="text-[10px] text-zinc-500">Cancelled orders excluded</span>
+              </div>
+
+              <div className="p-5 rounded-2xl bg-grill-card border border-grill-border space-y-1">
+                <span className="text-[11px] font-semibold text-zinc-400 uppercase">
+                  Action Needed
+                </span>
+                <p className="text-2xl font-black text-amber-400 font-mono">
+                  {metrics.actionNeededOrders}
                 </p>
                 <span className="text-[10px] text-zinc-500">
-                  Today: {metrics.todayOrders} orders
+                  {metrics.pendingPaymentVerifications} payment verification(s)
                 </span>
+              </div>
+
+              <div className="p-5 rounded-2xl bg-grill-card border border-grill-border space-y-1">
+                <span className="text-[11px] font-semibold text-zinc-400 uppercase">
+                  Completed Today
+                </span>
+                <p className="text-2xl font-black text-emerald-400 font-mono">
+                  {metrics.completedToday}
+                </p>
+                <span className="text-[10px] text-zinc-500">Successfully fulfilled</span>
               </div>
 
               <div className="p-5 rounded-2xl bg-grill-card border border-grill-border space-y-1">
                 <span className="text-[11px] font-semibold text-zinc-400 uppercase">
                   Total Revenue
                 </span>
-                <p className="text-2xl font-black text-grill-gold font-mono">
+                <p className="text-2xl font-black text-white font-mono">
                   {formatPKR(metrics.totalSales)}
                 </p>
-                <span className="text-[10px] text-emerald-400 font-medium">
-                  Verified & Placed Orders
-                </span>
-              </div>
-
-              <div className="p-5 rounded-2xl bg-grill-card border border-grill-border space-y-1">
-                <span className="text-[11px] font-semibold text-zinc-400 uppercase">
-                  Pending Verification
-                </span>
-                <p className="text-2xl font-black text-amber-400 font-mono">
-                  {metrics.pendingPaymentVerifications}
-                </p>
-                <span className="text-[10px] text-zinc-500">Easypaisa / Jazz / Bank</span>
-              </div>
-
-              <div className="p-5 rounded-2xl bg-grill-card border border-grill-border space-y-1">
-                <span className="text-[11px] font-semibold text-zinc-400 uppercase">
-                  In Kitchen Preparation
-                </span>
-                <p className="text-2xl font-black text-grill-orange font-mono">
-                  {metrics.preparingOrders}
-                </p>
-                <span className="text-[10px] text-zinc-500">Live Grills & Karahi</span>
+                <span className="text-[10px] text-zinc-500">All time, excluding cancelled</span>
               </div>
             </div>
 
@@ -624,7 +732,220 @@ export default function AdminDashboardPage() {
         )}
 
         {/* ========================================================
-            TAB 2: ORDER MANAGEMENT
+            TAB 2: DAILY SALES REPORT
+           ======================================================== */}
+        {activeTab === 'daily-sales' && (
+          <div id="daily-sales-print" className="space-y-6">
+            <div className="flex flex-col gap-4 rounded-2xl border border-grill-border bg-grill-card p-5 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h2 className="font-heading text-xl font-bold text-white">Daily Sales Report</h2>
+                <p className="mt-1 text-xs text-zinc-400">
+                  Sales and orders are grouped by Pakistan Standard Time. Cancelled orders are
+                  excluded from revenue.
+                </p>
+              </div>
+              <div className="flex flex-wrap items-center gap-2 print:hidden">
+                <label htmlFor="daily-sales-date" className="text-xs font-semibold text-zinc-300">
+                  Report date
+                </label>
+                <input
+                  id="daily-sales-date"
+                  type="date"
+                  value={reportDate}
+                  max={getBusinessDate(new Date())}
+                  onChange={(event) => setReportDate(event.target.value)}
+                  className="rounded-lg border border-zinc-700 bg-grill-dark px-3 py-2 text-xs text-white"
+                />
+                <button
+                  type="button"
+                  onClick={() => setReportRefreshKey((value) => value + 1)}
+                  disabled={dailyReportLoading}
+                  className="inline-flex items-center gap-2 rounded-lg bg-zinc-800 px-3 py-2 text-xs font-semibold text-white hover:bg-zinc-700 disabled:opacity-50"
+                >
+                  <RefreshCw className={`h-3.5 w-3.5 ${dailyReportLoading ? 'animate-spin' : ''}`} />
+                  Refresh
+                </button>
+                <button
+                  type="button"
+                  onClick={exportDailySalesCsv}
+                  disabled={!dailyReport || dailyReportLoading}
+                  className="inline-flex items-center gap-2 rounded-lg bg-grill-gold px-3 py-2 text-xs font-bold text-grill-black hover:brightness-110 disabled:opacity-50"
+                >
+                  <Download className="h-3.5 w-3.5" />
+                  Export CSV
+                </button>
+                <button
+                  type="button"
+                  onClick={() => window.print()}
+                  disabled={!dailyReport || dailyReportLoading}
+                  className="inline-flex items-center gap-2 rounded-lg bg-zinc-800 px-3 py-2 text-xs font-semibold text-white hover:bg-zinc-700 disabled:opacity-50"
+                >
+                  <Printer className="h-3.5 w-3.5" />
+                  Print
+                </button>
+              </div>
+            </div>
+
+            {dailyReportError && (
+              <div role="alert" className="rounded-xl border border-red-800 bg-red-950/60 p-4 text-sm text-red-200">
+                {dailyReportError}
+              </div>
+            )}
+
+            {dailyReportLoading && !dailyReport ? (
+              <div className="rounded-2xl border border-grill-border bg-grill-card p-10 text-center text-sm text-zinc-400">
+                Loading daily sales report…
+              </div>
+            ) : dailyReport ? (
+              <div className="space-y-6">
+                <div className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-5">
+                  {[
+                    { label: 'Orders', value: dailyReport.orderCount, detail: `${dailyReport.completedOrders} completed` },
+                    { label: 'Net Sales', value: formatPKR(dailyReport.revenue), detail: 'Cancelled orders excluded' },
+                    { label: 'Average Order', value: formatPKR(dailyReport.averageOrderValue), detail: 'Per non-cancelled order' },
+                    { label: 'Pending', value: dailyReport.pendingOrders, detail: 'Awaiting completion' },
+                    { label: 'Cancelled', value: dailyReport.cancelledOrders, detail: 'Not included in sales' },
+                  ].map((metric) => (
+                    <div key={metric.label} className="rounded-2xl border border-grill-border bg-grill-card p-5">
+                      <span className="text-[10px] font-bold uppercase tracking-wide text-zinc-400">{metric.label}</span>
+                      <p className="mt-2 break-words font-mono text-xl font-black text-white">{metric.value}</p>
+                      <span className="mt-1 block text-[10px] text-zinc-500">{metric.detail}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="grid gap-6 xl:grid-cols-2">
+                  <section className="rounded-2xl border border-grill-border bg-grill-card p-5">
+                    <h3 className="mb-4 flex items-center gap-2 font-heading text-sm font-bold text-white">
+                      <CreditCard className="h-4 w-4 text-grill-gold" />
+                      Sales by Payment Method
+                    </h3>
+                    <div className="space-y-3">
+                      {dailyReport.paymentBreakdown.map((entry) => (
+                        <div key={entry.method} className="flex items-center justify-between gap-3 border-b border-zinc-800 pb-3 last:border-0 last:pb-0">
+                          <div>
+                            <p className="text-xs font-semibold capitalize text-zinc-200">
+                              {entry.method.replace(/_/g, ' ')}
+                            </p>
+                            <p className="mt-1 text-[10px] text-zinc-500">{entry.orders} order(s)</p>
+                          </div>
+                          <span className="font-mono text-sm font-bold text-grill-gold">{formatPKR(entry.revenue)}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </section>
+
+                  <section className="rounded-2xl border border-grill-border bg-grill-card p-5">
+                    <h3 className="mb-4 flex items-center gap-2 font-heading text-sm font-bold text-white">
+                      <TrendingUp className="h-4 w-4 text-grill-gold" />
+                      Best-Selling Items
+                    </h3>
+                    {dailyReport.topItems.length === 0 ? (
+                      <p className="py-5 text-center text-xs text-zinc-500">No non-cancelled sales on this date.</p>
+                    ) : (
+                      <div className="space-y-3">
+                        {dailyReport.topItems.map((item, index) => (
+                          <div key={item.id} className="flex items-center justify-between gap-3 border-b border-zinc-800 pb-3 last:border-0 last:pb-0">
+                            <div className="flex min-w-0 items-center gap-3">
+                              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-zinc-800 text-[10px] font-bold text-grill-gold">{index + 1}</span>
+                              <span className="truncate text-xs font-semibold text-white">{item.name}</span>
+                            </div>
+                            <div className="shrink-0 text-right">
+                              <span className="block text-xs font-bold text-zinc-200">{item.quantity} sold</span>
+                              <span className="font-mono text-[10px] text-grill-gold">{formatPKR(item.revenue)}</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </section>
+                </div>
+
+                <section className="overflow-hidden rounded-2xl border border-grill-border bg-grill-card">
+                  <div className="flex items-center justify-between border-b border-grill-border p-5">
+                    <div>
+                      <h3 className="font-heading text-sm font-bold text-white">Orders for {dailyReport.date}</h3>
+                      <p className="mt-1 text-[10px] text-zinc-500">{dailyReport.orderCount} order(s)</p>
+                    </div>
+                    <CalendarDays className="h-5 w-5 text-grill-gold" />
+                  </div>
+                  {dailyReport.orders.length === 0 ? (
+                    <p className="p-8 text-center text-xs text-zinc-500">No orders recorded for this date.</p>
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <table className="w-full min-w-[760px] text-left text-xs">
+                        <thead className="bg-grill-dark text-[10px] uppercase text-zinc-400">
+                          <tr>
+                            <th className="p-3">Order</th>
+                            <th className="p-3">Time (PKT)</th>
+                            <th className="p-3">Customer</th>
+                            <th className="p-3">Items</th>
+                            <th className="p-3">Payment</th>
+                            <th className="p-3">Status</th>
+                            <th className="p-3 text-right">Total</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-zinc-800">
+                          {dailyReport.orders.map((order) => (
+                            <tr key={order.id} className="text-zinc-300">
+                              <td className="p-3 font-mono font-bold text-white">{order.id}</td>
+                              <td className="p-3">{new Intl.DateTimeFormat('en-PK', { hour: 'numeric', minute: '2-digit', timeZone: SALES_TIME_ZONE }).format(new Date(order.createdAt))}</td>
+                              <td className="p-3">{order.customerName}</td>
+                              <td className="p-3">{order.items.reduce((total, item) => total + item.quantity, 0)}</td>
+                              <td className="p-3 capitalize">{order.paymentMethod.replace(/_/g, ' ')}</td>
+                              <td className="p-3">
+                                <span className={`rounded-full px-2 py-1 text-[10px] font-semibold capitalize ${
+                                  order.orderStatus === 'cancelled'
+                                    ? 'bg-red-950 text-red-300'
+                                    : order.orderStatus === 'completed'
+                                    ? 'bg-emerald-950 text-emerald-300'
+                                    : 'bg-zinc-800 text-zinc-300'
+                                }`}>
+                                  {order.orderStatus.replace(/_/g, ' ')}
+                                </span>
+                              </td>
+                              <td className="p-3 text-right font-mono font-bold text-grill-gold">{formatPKR(order.totalAmount)}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </section>
+              </div>
+            ) : null}
+            <style jsx global>{`
+              @media print {
+                body * {
+                  visibility: hidden !important;
+                }
+
+                #daily-sales-print,
+                #daily-sales-print * {
+                  visibility: visible !important;
+                }
+
+                #daily-sales-print {
+                  position: absolute;
+                  inset: 0;
+                  width: 100%;
+                  background: #fff !important;
+                  color: #111 !important;
+                }
+
+                #daily-sales-print * {
+                  border-color: #ddd !important;
+                  background: transparent !important;
+                  box-shadow: none !important;
+                  color: #111 !important;
+                }
+              }
+            `}</style>
+          </div>
+        )}
+
+        {/* ========================================================
+            TAB 3: ORDER MANAGEMENT
            ======================================================== */}
         {activeTab === 'orders' && (
           <div className="space-y-6">

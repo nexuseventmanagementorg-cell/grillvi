@@ -9,7 +9,7 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const order = getOrderById(id);
+    const order = await getOrderById(id);
 
     if (!order) {
       return NextResponse.json({ error: 'Order not found.' }, { status: 404 });
@@ -36,17 +36,17 @@ export async function PATCH(
     const body = await req.json();
     const { status, paymentVerificationStatus, note } = body;
 
-    let order = getOrderById(id);
+    let order = await getOrderById(id);
     if (!order) {
       return NextResponse.json({ error: 'Order not found.' }, { status: 404 });
     }
 
     if (paymentVerificationStatus) {
-      order = verifyPayment(id, paymentVerificationStatus as PaymentVerificationStatus, note);
+      order = await verifyPayment(id, paymentVerificationStatus as PaymentVerificationStatus, note);
     }
 
     if (status) {
-      order = updateOrderStatus(id, status as OrderStatus, note, session.username);
+      order = await updateOrderStatus(id, status as OrderStatus, note, session.username);
     }
 
     return NextResponse.json({ success: true, order });
